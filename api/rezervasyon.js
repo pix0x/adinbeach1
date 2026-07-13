@@ -9,24 +9,20 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Body'yi stream'den oku
     let raw = '';
-    for await (const chunk of req) {
-      raw += chunk;
-    }
-
-    // BOM temizle
-    raw = raw.trim();
+    for await (const chunk of req) raw += chunk;
 
     let body;
     try { body = JSON.parse(raw); }
-    catch (e) {
-      return res.status(400).json({
-        success: false,
-        error: 'JSON parse hatası: ' + e.message,
-        raw: raw.substring(0, 500),
-        hex: Buffer.from(raw).toString('hex').substring(0, 200),
-      });
+    catch {
+      // URL-encoded format dene
+      try {
+        body = {};
+        const qs = new URLSearchParams(raw);
+        for (const [k, v] of qs) body[k] = v;
+      } catch {
+        return res.status(400).json({ success: false, error: 'Geçersiz istek formatı.' });
+      }
     }
 
     const giris   = (body.giris   || '').trim();
@@ -37,6 +33,7 @@ module.exports = async (req, res) => {
     const notlar  = (body.not     || '').trim();
     const yetiskinSayisi = Math.min(Math.max(parseInt(body.yetiskin_sayisi) || 1, 1), 5);
 
+    // Validation
     const errors = [];
     if (!giris)   errors.push('Giriş tarihi zorunludur.');
     if (!cikis)   errors.push('Çıkış tarihi zorunludur.');
@@ -47,14 +44,15 @@ module.exports = async (req, res) => {
       return res.status(400).json({ success: false, error: errors.join('<br>') });
     }
 
-    // Telegram
+    // Telegram bildirimi
     const token  = process.env.TELEGRAM_BOT_TOKEN || '';
     const chatId = process.env.TELEGRAM_CHAT_ID   || '';
     let telegramOk = false;
 
     if (token && chatId) {
       let msg = `<b>🛎 YENİ REZERVASYON TALEBİ</b>\n\n`;
-      msg += `<b>📅 Giriş:</b> ${giris}\n<b>📅 Çıkış:</b> ${cikis}\n`;
+      msg += `<b>📅 Giriş:</b> ${giris}\n`;
+      msg += `<b>📅 Çıkış:</b> ${cikis}\n`;
       msg += `<b>🏠 Oda Tipi:</b> ${odaTipi}\n`;
       msg += `<b>👤 Yetişkin:</b> ${yetiskinSayisi}\n`;
       if (email)   msg += `<b>📧 E-posta:</b> ${email}\n`;
@@ -72,11 +70,14 @@ module.exports = async (req, res) => {
     }
 
     if (telegramOk || !token) {
-      return res.status(200).json({ success: true, message: 'Rezervasyon talebiniz başarıyla alındı! En kısa sürede sizinle iletişime geçeceğiz.' });
+      return res.status(200).json({
+        success: true,
+        message: 'Rezervasyon talebiniz başarıyla alındı! En kısa sürede sizinle iletişime geçeceğiz.',
+      });
     } else {
       return res.status(500).json({ success: false, error: 'Telegram bildirimi gönderilemedi.' });
     }
   } catch (err) {
-    return res.status(500).json({ success: false, error: err.message, stack: err.stack });
+    return res.status(500).json({ success: false, error: err.message });
   }
 };
