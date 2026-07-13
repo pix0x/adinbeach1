@@ -7,3 +7,5 @@ Thumbs.db
 .env.local
 admin/config.json
 rezervasyonlar.json
+
+.vercel
