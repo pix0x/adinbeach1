@@ -1,0 +1,517 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rezervasyon — Adin Beach Hotel</title>
+<meta name="theme-color" content="#bb9b6a">
+<link rel="icon" type="image/png" href="../images/brand/favIcon.png">
+<link rel="stylesheet" href="../assets/css/google-fonts.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Montserrat',system-ui,sans-serif;
+  background:#111110;color:#e7e1d6;
+  min-height:100vh;display:flex;flex-direction:column;
+}
+:root{
+  --gold:#bb9b6a;--gold-dim:#8a7450;
+  --ink:#1c1c1a;--body:#e7e1d6;--body-muted:#a09888;
+}
+/* --- TOP BAR --- */
+.top-bar{
+  background:#1a1a18;border-bottom:1px solid rgba(255,255,255,.08);
+  padding:.5rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:.75rem;color:rgba(255,255,255,.85);
+}
+.top-bar a{color:inherit;text-decoration:none;transition:color .2s}
+.top-bar a:hover{color:#fff}
+.top-bar .phone{display:inline-flex;align-items:center;gap:.5rem}
+.top-bar .social{display:flex;align-items:center;gap:.75rem}
+.top-bar .social svg{width:1rem;height:1rem;fill:currentColor}
+/* --- HEADER --- */
+.site-header{
+  position:fixed;inset:0 0 auto 0;z-index:50;
+  background:linear-gradient(180deg,rgba(0,0,0,.55),transparent);
+  padding:.75rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.site-header .logo{height:2.5rem}
+.main-nav{display:flex;align-items:center;gap:1.5rem}
+.main-nav a{
+  color:rgba(255,255,255,.85);text-decoration:none;
+  font-size:.78rem;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;transition:color .2s;white-space:nowrap;
+}
+.main-nav a:hover{color:var(--gold)}
+.main-nav .nav-cta{
+  background:var(--gold);color:var(--ink);padding:.5rem 1.25rem;
+  border-radius:.375rem;font-weight:600;font-size:.72rem;
+  transition:background .3s,transform .2s;
+}
+.main-nav .nav-cta:hover{background:#c9a977;color:var(--ink);transform:translateY(-1px)}
+@media(max-width:900px){.main-nav{display:none}}
+/* --- HERO --- */
+.hero{
+  position:relative;height:40vh;min-height:280px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.65)),url('../assets/images/home/reservation-cta.jpg') center/cover no-repeat;
+}
+.hero-content{position:relative;z-index:1;padding:1.5rem}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:500;font-size:clamp(2rem,5vw,3.5rem);
+  color:#fff;margin-bottom:.5rem;
+}
+.hero p{color:var(--body-muted);font-size:.9rem;letter-spacing:.04em}
+.hero .gold-line{width:3rem;height:2px;background:var(--gold);margin:.75rem auto 0}
+/* --- FORM CARD --- */
+.form-section{padding:2rem 1rem 4rem;flex:1}
+.form-card{
+  max-width:720px;margin:0 auto;
+  background:#1a1a18;border-radius:1rem;
+  padding:2rem;border:1px solid rgba(255,255,255,.06);
+}
+.form-card h2{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:500;font-size:1.5rem;color:#fff;margin-bottom:.25rem;
+}
+.form-card .form-subtitle{
+  font-size:.8rem;color:var(--body-muted);margin-bottom:1.75rem;
+}
+/* --- FIELDS --- */
+.field-group{margin-bottom:1.25rem}
+.field-label{
+  display:block;font-size:.72rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:.4rem;
+}
+.field{
+  width:100%;padding:.7rem .85rem;
+  background:#22211e;border:1px solid rgba(255,255,255,.08);
+  border-radius:.5rem;color:var(--body);font-size:.875rem;
+  font-family:'Montserrat',system-ui,sans-serif;
+  transition:border-color .2s,box-shadow .2s;outline:none;
+}
+.field:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(187,155,106,.15)}
+.field::placeholder{color:var(--body-muted);opacity:.6}
+select.field option{background:#1a1a18;color:var(--body)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:480px){.field-row{grid-template-columns:1fr}}
+/* --- STEPPER --- */
+.stepper{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;
+}
+.stepper-label{font-size:.8rem;color:var(--body)}
+.stepper-label span{color:var(--body-muted);font-size:.75rem}
+.stepper-controls{display:flex;align-items:center;gap:.5rem}
+.stepper-btn{
+  width:2.25rem;height:2.25rem;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid rgba(231,225,214,.15);
+  border-radius:.375rem;color:var(--body);
+  font-size:1.1rem;cursor:pointer;transition:all .2s;
+}
+.stepper-btn:hover{border-color:var(--gold);color:var(--gold)}
+.stepper-btn:disabled{opacity:.3;cursor:not-allowed}
+.stepper-value{
+  width:1.75rem;text-align:center;
+  font-weight:600;font-size:1rem;color:#fff;
+}
+.guest-inputs{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem}
+@media(max-width:480px){.guest-inputs{grid-template-columns:1fr}}
+/* --- BUTTON --- */
+.btn-primary{
+  width:100%;padding:.9rem 2rem;
+  background:var(--gold);color:var(--ink);
+  border:none;border-radius:.5rem;
+  font-family:'Montserrat',system-ui,sans-serif;
+  font-weight:600;font-size:.85rem;
+  letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;transition:all .3s;
+  position:relative;
+}
+.btn-primary:hover{background:#c9a977;transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-primary .spinner{display:none}
+.btn-primary.loading .spinner{
+  display:inline-block;width:1rem;height:1rem;
+  border:2px solid rgba(0,0,0,.2);border-top-color:var(--ink);
+  border-radius:50%;animation:spin .6s linear infinite;
+  position:absolute;right:1rem;top:50%;margin-top:-.5rem;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* --- NOTIFICATIONS --- */
+.notification{padding:1rem 1.25rem;border-radius:.5rem;margin-bottom:1.5rem;font-size:.875rem;line-height:1.5}
+.notification.success{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#86efac}
+.notification.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
+/* --- SUCCESS --- */
+.success-page{text-align:center;padding:3rem 1rem}
+.success-page .icon{font-size:4rem;margin-bottom:1rem}
+.success-page h2{font-family:'Cormorant Garamond',serif;font-size:2rem;color:#fff;margin-bottom:.75rem}
+.success-page p{color:var(--body-muted);max-width:400px;margin:0 auto 1.5rem;font-size:.9rem}
+.success-page .btn-back{
+  display:inline-flex;align-items:center;gap:.5rem;
+  color:var(--gold);text-decoration:none;
+  font-size:.85rem;font-weight:600;transition:color .2s;
+}
+.success-page .btn-back:hover{color:#c9a977}
+/* --- FOOTER --- */
+.site-footer{
+  background:#111110;border-top:1px solid rgba(255,255,255,.06);
+  padding:2rem 1.5rem;text-align:center;
+  font-size:.75rem;color:var(--body-muted);margin-top:auto;
+}
+/* --- LOADING OVERLAY (inline form) --- */
+.form-loading{opacity:.5;pointer-events:none;transition:opacity .2s}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar" id="topBar">
+  <a href="tel:+902424394918" class="phone">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:.85rem;height:.85rem"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+    +90 242 439 49 18
+  </a>
+  <div class="social">
+    <a href="https://wa.me/905452355493" target="_blank" aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24"><path d="M12.04 2a9.9 9.9 0 0 0-8.4 15.1L2 22l5.05-1.32A9.9 9.9 0 1 0 12.04 2zm0 1.8a8.1 8.1 0 1 1-4.13 15.06l-.3-.18-3 .78.8-2.92-.2-.31A8.1 8.1 0 0 1 12.04 3.8z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/adinhotel/" target="_blank" aria-label="Instagram">
+      <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.3-1.7 4.8-4.9 4.9-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.2-.1-1.6-.1-4.8s0-3.6.1-4.8C2.3 3.9 3.9 2.3 7.2 2.2 8.4 2.2 8.8 2.2 12 2.2zM12 0C8.7 0 8.3 0 7.1.1 2.9.3.3 2.9.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.2 2.8 6.8 7 7 1.2.1 1.6.1 4.9.1s3.7 0 4.9-.1c4.2-.2 6.8-2.8 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.2-2.8-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-10.5a1.45 1.45 0 1 0 0 2.9 1.45 1.45 0 0 0 0-2.9z"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a href="../index.html"><img src="../assets/images/brand/logo-white.png" alt="Adin Beach Hotel" class="logo"></a>
+  <nav class="main-nav">
+    <a href="../odalar/">Odalar</a>
+    <a href="../lezzet/">Lezzet</a>
+    <a href="../deniz-ve-havuz/">Deniz &amp; Havuz</a>
+    <a href="../eglence/">Eğlence</a>
+    <a href="../toplanti/">Toplantı</a>
+    <a href="../hakkimizda/">Hakkımızda</a>
+    <a href="../bize-ulasin/">İletişim</a>
+    <a href="../rezervasyon/" class="nav-cta">Rezervasyon</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <h1>Rezervasyon Talebi</h1>
+    <p>Size özel teklifimizi hazırlamamız için bilgilerinizi doldurun</p>
+    <div class="gold-line"></div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section">
+  <div class="form-card" id="formCard">
+
+    <!-- notification area (doldurulur JS ile) -->
+    <div id="notification"></div>
+
+    <!-- SUCCESS (gizli, JS gösterir) -->
+    <div id="successPage" class="success-page" style="display:none">
+      <div class="icon">✅</div>
+      <h2>Teşekkür Ederiz!</h2>
+      <p id="successMessage">Rezervasyon talebiniz başarıyla alındı! En kısa sürede sizinle iletişime geçeceğiz.</p>
+      <a href="../index.html" class="btn-back">← Ana Sayfaya Dön</a>
+    </div>
+
+    <!-- FORM -->
+    <div id="formWrapper">
+      <h2>Rezervasyon Bilgileri</h2>
+      <p class="form-subtitle">Tüm alanları eksiksiz doldurunuz</p>
+
+      <form id="reservationForm" novalidate>
+
+        <!-- TARİHLER -->
+        <div class="field-group">
+          <div class="field-label" style="margin-bottom:.75rem">
+            <span style="display:inline-flex;align-items:center;gap:.5rem">
+              <span style="display:inline-block;width:1.5rem;height:1px;background:var(--gold-dim)"></span>
+              Tarihler
+            </span>
+          </div>
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="giris">Giriş Tarihi *</label>
+              <input type="date" id="giris" name="giris" class="field" required>
+            </div>
+            <div>
+              <label class="field-label" for="cikis">Çıkış Tarihi *</label>
+              <input type="date" id="cikis" name="cikis" class="field" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- ODA TİPİ -->
+        <div class="field-group">
+          <div class="field-label" style="margin-bottom:.75rem">
+            <span style="display:inline-flex;align-items:center;gap:.5rem">
+              <span style="display:inline-block;width:1.5rem;height:1px;background:var(--gold-dim)"></span>
+              Oda Tipi
+            </span>
+          </div>
+          <label class="field-label" for="oda_tipi">Oda Tipi *</label>
+          <select id="oda_tipi" name="oda_tipi" class="field" required>
+            <option value="">Lütfen bir oda tipi seçin</option>
+            <optgroup label="Premium Odalar">
+              <option value="Deniz Manzaralı Premium Dubleks Royal Oda">Deniz Manzaralı Premium Dubleks Royal Oda</option>
+              <option value="Deniz Manzaralı Premium Dubleks Superior Oda">Deniz Manzaralı Premium Dubleks Superior Oda</option>
+              <option value="Deniz Manzaralı Premium Suit Oda">Deniz Manzaralı Premium Suit Oda</option>
+              <option value="Deniz Manzaralı Premium Aile Oda">Deniz Manzaralı Premium Aile Oda</option>
+              <option value="Deniz Manzaralı Premium Connection Oda">Deniz Manzaralı Premium Connection Oda</option>
+              <option value="Deniz Manzaralı Premium Standart Oda">Deniz Manzaralı Premium Standart Oda</option>
+              <option value="Deniz Manzaralı Premium Engelli Oda">Deniz Manzaralı Premium Engelli Oda</option>
+            </optgroup>
+            <optgroup label="Flora Odalar">
+              <option value="Bahçe Manzaralı Flora Oda">Bahçe Manzaralı Flora Oda</option>
+              <option value="Bahçe Manzaralı Flora Connection Oda">Bahçe Manzaralı Flora Connection Oda</option>
+              <option value="Bahçe Manzaralı Flora Dublex Oda">Bahçe Manzaralı Flora Dublex Oda</option>
+              <option value="Bahçe & Deniz Manzaralı Flora Mercan">Bahçe &amp; Deniz Manzaralı Flora Mercan</option>
+              <option value="Bahçe Manzaralı Flora Yasemin">Bahçe Manzaralı Flora Yasemin</option>
+            </optgroup>
+            <optgroup label="Size Özel Villa">
+              <option value="Villa Gloria">Villa Gloria</option>
+              <option value="Villa Magnolia">Villa Magnolia</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- MİSAFİRLER -->
+        <div class="field-group">
+          <div class="field-label" style="margin-bottom:.75rem">
+            <span style="display:inline-flex;align-items:center;gap:.5rem">
+              <span style="display:inline-block;width:1.5rem;height:1px;background:var(--gold-dim)"></span>
+              Konaklayacak Misafirler
+            </span>
+          </div>
+
+          <div class="stepper" data-min="1" data-max="5" data-target="yetiskin" id="stepperYetiskin">
+            <span class="stepper-label">Yetişkin <span>(1–5)</span></span>
+            <div class="stepper-controls">
+              <button type="button" class="stepper-btn" aria-label="Azalt">−</button>
+              <span class="stepper-value">2</span>
+              <button type="button" class="stepper-btn" aria-label="Arttır">+</button>
+            </div>
+          </div>
+          <input type="hidden" name="yetiskin_sayisi" value="2" id="h_yetiskin_sayisi">
+          <div class="guest-inputs" id="guest_yetiskin">
+            <input type="text" name="yetiskin_1" class="field" placeholder="1. Yetişkin Ad Soyad" maxlength="24">
+            <input type="text" name="yetiskin_2" class="field" placeholder="2. Yetişkin Ad Soyad" maxlength="24">
+            <input type="text" name="yetiskin_3" class="field" placeholder="3. Yetişkin Ad Soyad" maxlength="24" style="display:none">
+            <input type="text" name="yetiskin_4" class="field" placeholder="4. Yetişkin Ad Soyad" maxlength="24" style="display:none">
+            <input type="text" name="yetiskin_5" class="field" placeholder="5. Yetişkin Ad Soyad" maxlength="24" style="display:none">
+          </div>
+
+          <div class="stepper" data-min="0" data-max="5" data-target="" id="stepperCocuk">
+            <span class="stepper-label">Çocuk <span>(0–5)</span></span>
+            <div class="stepper-controls">
+              <button type="button" class="stepper-btn" disabled aria-label="Azalt">−</button>
+              <span class="stepper-value">0</span>
+              <button type="button" class="stepper-btn" aria-label="Arttır">+</button>
+            </div>
+          </div>
+          <input type="hidden" name="cocuk_sayisi" value="0" id="h_cocuk_sayisi">
+          <p style="font-size:.75rem;color:var(--body-muted);margin-top:.25rem">Çocuk yaşları, doğru fiyatlandırma için doğum tarihinden hesaplanır.</p>
+        </div>
+
+        <!-- İLETİŞİM -->
+        <div class="field-group">
+          <div class="field-label" style="margin-bottom:.75rem">
+            <span style="display:inline-flex;align-items:center;gap:.5rem">
+              <span style="display:inline-block;width:1.5rem;height:1px;background:var(--gold-dim)"></span>
+              İletişim Bilgileri
+            </span>
+          </div>
+          <div class="field-row">
+            <div>
+              <label class="field-label" for="email">E-posta</label>
+              <input type="email" id="email" name="email" class="field" placeholder="ornek@eposta.com">
+            </div>
+            <div>
+              <label class="field-label" for="telefon">Telefon</label>
+              <input type="tel" id="telefon" name="telefon" class="field" placeholder="+90 5xx xxx xx xx">
+            </div>
+          </div>
+          <p style="font-size:.75rem;color:var(--body-muted);margin-top:.25rem">E-posta veya telefon alanından en az birini doldurunuz.</p>
+        </div>
+
+        <!-- NOT -->
+        <div class="field-group">
+          <label class="field-label" for="not">Özel İstek / Not</label>
+          <textarea id="not" name="not" rows="4" maxlength="600" class="field" placeholder="Bizimle paylaşmak istediğiniz özel istekleriniz..."></textarea>
+        </div>
+
+        <!-- SUBMIT -->
+        <button type="submit" class="btn-primary" id="submitBtn">
+          Rezervasyon Talebi Gönder
+          <span class="spinner"></span>
+        </button>
+
+        <p style="text-align:center;font-size:.75rem;color:var(--body-muted);margin-top:.75rem">
+          Talebinizi göndererek
+          <a href="../hakkimizda/index.html" style="color:var(--gold);text-decoration:underline;text-underline-offset:2px">KVKK Aydınlatma Metni</a>'ni
+          okuduğunuzu kabul edersiniz.
+        </p>
+
+      </form>
+    </div><!-- /formWrapper -->
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  Adin Beach Hotel &copy; <span id="year"></span> &mdash; Tüm hakları saklıdır.
+</footer>
+
+<script>
+// --- Yıl ---
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// --- Tarih kontrolleri ---
+(function() {
+  var giris = document.getElementById('giris');
+  var cikis = document.getElementById('cikis');
+  var today = new Date();
+  var y = today.getFullYear();
+  var m = String(today.getMonth() + 1).padStart(2, '0');
+  var d = String(today.getDate()).padStart(2, '0');
+  giris.min = y + '-' + m + '-' + d;
+
+  giris.addEventListener('change', function() {
+    cikis.min = giris.value || giris.min;
+    if (cikis.value && cikis.value <= giris.value) cikis.value = '';
+  });
+})();
+
+// --- Stepper'lar ---
+document.querySelectorAll('.stepper').forEach(function(stepper) {
+  var display = stepper.querySelector('.stepper-value');
+  var btns = stepper.querySelectorAll('.stepper-btn');
+  var btnMinus = btns[0];
+  var btnPlus  = btns[1];
+  var min = parseInt(stepper.dataset.min || 1);
+  var max = parseInt(stepper.dataset.max || 5);
+  var targetName = stepper.dataset.target || '';
+
+  var hiddenInput = stepper.parentNode.querySelector('input[type=hidden]');
+  if (!hiddenInput) hiddenInput = stepper.nextElementSibling;
+
+  function update(val) {
+    if (val < min) val = min;
+    if (val > max) val = max;
+    display.textContent = val;
+    btnMinus.disabled = val <= min;
+    if (hiddenInput) hiddenInput.value = val;
+
+    if (targetName) {
+      var container = document.getElementById('guest_' + targetName);
+      if (container) {
+        var inputs = container.querySelectorAll('input');
+        for (var i = 0; i < inputs.length; i++) {
+          inputs[i].style.display = i < val ? '' : 'none';
+        }
+      }
+    }
+  }
+
+  btnPlus.addEventListener('click',  function() { update(parseInt(display.textContent) + 1); });
+  btnMinus.addEventListener('click', function() { update(parseInt(display.textContent) - 1); });
+});
+
+// --- Form submit (fetch API) ---
+document.getElementById('reservationForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  var form = this;
+  var btn = document.getElementById('submitBtn');
+  var notif = document.getElementById('notification');
+  var formWrapper = document.getElementById('formWrapper');
+
+  // Önceki bildirimi temizle
+  notif.innerHTML = '';
+  notif.style.display = 'none';
+
+  // Client-side doğrulama
+  var giris = form.giris.value.trim();
+  var cikis = form.cikis.value.trim();
+  var odaTipi = form.oda_tipi.value;
+  var email = form.email.value.trim();
+  var telefon = form.telefon.value.trim();
+
+  var errors = [];
+  if (!giris) errors.push('Giriş tarihi zorunludur.');
+  if (!cikis) errors.push('Çıkış tarihi zorunludur.');
+  if (!odaTipi) errors.push('Oda tipi seçiniz.');
+  if (!email && !telefon) errors.push('E-posta veya telefon alanından en az birini doldurun.');
+
+  if (errors.length) {
+    notif.innerHTML = '<div class="notification error">' + errors.join('<br>') + '</div>';
+    notif.style.display = 'block';
+    notif.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // JSON body oluştur
+  var formData = new FormData(form);
+  var data = {};
+  for (var pair of formData.entries()) {
+    data[pair[0]] = pair[1];
+  }
+
+  // Loading state
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.innerHTML = 'Gönderiliyor... <span class="spinner"></span>';
+  formWrapper.classList.add('form-loading');
+
+  try {
+    var res = await fetch('/api/rezervasyon', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    var result = await res.json();
+
+    if (result.success) {
+      // Başarılı → success sayfasını göster
+      formWrapper.style.display = 'none';
+      document.getElementById('successMessage').textContent = result.message;
+      document.getElementById('successPage').style.display = 'block';
+      document.getElementById('successPage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      // Hata → notification göster
+      notif.innerHTML = '<div class="notification error">' + (result.error || 'Bir hata oluştu.') + '</div>';
+      notif.style.display = 'block';
+      notif.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  } catch (err) {
+    notif.innerHTML = '<div class="notification error">Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.</div>';
+    notif.style.display = 'block';
+    notif.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.innerHTML = 'Rezervasyon Talebi Gönder<span class="spinner"></span>';
+    formWrapper.classList.remove('form-loading');
+  }
+});
+</script>
+</body>
+</html>
