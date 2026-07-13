@@ -18,18 +18,27 @@ module.exports = async function handler(req, res) {
     const CFG = {
       TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || '',
       TELEGRAM_CHAT_ID:   process.env.TELEGRAM_CHAT_ID   || '',
-      WHATSAPP_NUMBER:    process.env.WHATSAPP_NUMBER    || '',
-      WHATSAPP_API_KEY:   process.env.WHATSAPP_API_KEY   || '',
-      WHATSAPP_ENABLED:   process.env.WHATSAPP_ENABLED   === 'true',
     };
 
-    // --- Body parse ---
+    // --- Ham body'yi oku ---
+    let raw = '';
+    if (req.body) {
+      if (Buffer.isBuffer(req.body)) raw = req.body.toString('utf-8');
+      else if (typeof req.body === 'object') raw = JSON.stringify(req.body);
+      else raw = String(req.body);
+    }
+
+    // Body'yi JSON olarak parse et
     let body = {};
-    if (req.headers['content-type']?.includes('application/json')) {
-      body = req.body || {};
-    } else if (req.headers['content-type']?.includes('application/x-www-form-urlencoded')) {
-      const qs = new URLSearchParams(req.body || '');
+    const ct = req.headers['content-type'] || '';
+    if (ct.includes('application/json')) {
+      try { body = JSON.parse(raw); } catch { body = {}; }
+    } else if (ct.includes('application/x-www-form-urlencoded')) {
+      const qs = new URLSearchParams(raw);
       for (const [k, v] of qs) body[k] = v;
+    } else {
+      // Deny: JSON olarak parse dene
+      try { body = JSON.parse(raw); } catch { body = {}; }
     }
 
     const giris   = (body.giris   || '').trim();
@@ -84,30 +93,10 @@ module.exports = async function handler(req, res) {
       const resp = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: CFG.TELEGRAM_CHAT_ID,
-          text: msg,
-          parse_mode: 'HTML',
-        }),
+        body: JSON.stringify({ chat_id: CFG.TELEGRAM_CHAT_ID, text: msg, parse_mode: 'HTML' }),
       });
       const data = await resp.json();
       telegramOk = data.ok === true;
-    }
-
-    // --- WhatsApp ---
-    if (CFG.WHATSAPP_ENABLED && CFG.WHATSAPP_NUMBER && CFG.WHATSAPP_API_KEY) {
-      let waMsg = `🛎 YENİ REZERVASYON TALEBİ%0A%0A`;
-      waMsg += `Giriş: ${giris}%0A`;
-      waMsg += `Çıkış: ${cikis}%0A`;
-      waMsg += `Oda: ${odaTipi}%0A`;
-      waMsg += `Yetişkin: ${yetiskinSayisi}%0A`;
-      if (cocukSayisi > 0) waMsg += `Çocuk: ${cocukSayisi}%0A`;
-      if (email) waMsg += `E-posta: ${email}%0A`;
-      if (telefon) waMsg += `Telefon: ${telefon}%0A`;
-      if (notlar) waMsg += `Not: ${notlar}%0A`;
-      waMsg += `Tarih: ${new Date().toLocaleString('tr-TR')}`;
-      const waUrl = `https://api.callmebot.com/whatsapp.php?phone=${CFG.WHATSAPP_NUMBER}&text=${waMsg}&apikey=${CFG.WHATSAPP_API_KEY}`;
-      await fetch(waUrl);
     }
 
     if (telegramOk || !CFG.TELEGRAM_BOT_TOKEN) {
