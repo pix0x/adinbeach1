@@ -9,12 +9,25 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Body'yi stream'den oku (Vercel runtime req.body getter'i bozuk)
+    // Body'yi stream'den oku
     let raw = '';
     for await (const chunk of req) {
       raw += chunk;
     }
-    const body = JSON.parse(raw);
+
+    // BOM temizle
+    raw = raw.trim();
+
+    let body;
+    try { body = JSON.parse(raw); }
+    catch (e) {
+      return res.status(400).json({
+        success: false,
+        error: 'JSON parse hatası: ' + e.message,
+        raw: raw.substring(0, 500),
+        hex: Buffer.from(raw).toString('hex').substring(0, 200),
+      });
+    }
 
     const giris   = (body.giris   || '').trim();
     const cikis   = (body.cikis   || '').trim();
@@ -24,7 +37,6 @@ module.exports = async (req, res) => {
     const notlar  = (body.not     || '').trim();
     const yetiskinSayisi = Math.min(Math.max(parseInt(body.yetiskin_sayisi) || 1, 1), 5);
 
-    // Validation
     const errors = [];
     if (!giris)   errors.push('Giriş tarihi zorunludur.');
     if (!cikis)   errors.push('Çıkış tarihi zorunludur.');
@@ -65,6 +77,6 @@ module.exports = async (req, res) => {
       return res.status(500).json({ success: false, error: 'Telegram bildirimi gönderilemedi.' });
     }
   } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
+    return res.status(500).json({ success: false, error: err.message, stack: err.stack });
   }
 };
