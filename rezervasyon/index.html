@@ -230,7 +230,8 @@ select.field option{background:#1a1a18;color:var(--body)}
 .notification.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5}
 /* --- SUCCESS --- */
 .success-page{text-align:center;padding:3rem 1rem}
-.success-page .icon{font-size:4rem;margin-bottom:1rem}
+.success-page .icon{color:var(--gold);margin-bottom:1rem}
+.success-page .icon svg{display:block;margin:0 auto;filter:drop-shadow(0 0 20px rgba(201,169,119,.3))}
 .success-page h2{font-family:'Cormorant Garamond',serif;font-size:2rem;color:#fff;margin-bottom:.75rem}
 .success-page p{color:var(--body-muted);max-width:400px;margin:0 auto 1.5rem;font-size:.9rem}
 .success-page .btn-back{
@@ -301,7 +302,12 @@ select.field option{background:#1a1a18;color:var(--body)}
 
     <!-- SUCCESS (gizli, JS gösterir) -->
     <div id="successPage" class="success-page" style="display:none">
-      <div class="icon">?</div>
+      <div class="icon">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+          <circle cx="36" cy="36" r="34" stroke="currentColor" stroke-width="3" opacity=".3"/>
+          <path d="M24 37l8 8 16-16" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <h2>Teşekkür Ederiz!</h2>
       <p id="successMessage">Rezervasyon talebiniz başarıyla alındı! En kısa sürede sizinle iletişime geçeceğiz.</p>
       <a href="../index.html" class="btn-back">‹ Ana Sayfaya Dön</a>
