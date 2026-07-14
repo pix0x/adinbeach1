@@ -1,19 +1,36 @@
 const fs = require('fs');
 const path = require('path');
+const { get, put } = require('@vercel/blob');
 
 const CONFIG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const TMP_PATH = '/tmp/config.json';
+const BLOB_PATH = 'config.json';
 
-function readConfig() {
-  // 1. Env var'lardan oku (kalıcı)
-  const cfg = {
+function getDefaults() {
+  return {
     iban: process.env.CONFIG_IBAN || '',
     name: process.env.CONFIG_NAME || '',
     phone: process.env.CONFIG_PHONE || '',
     whatsapp: process.env.CONFIG_WHATSAPP || '',
   };
+}
 
-  // 2. /tmp/config.json (Telegram runtime güncellemeleri)
+async function readConfig() {
+  const cfg = getDefaults();
+
+  // 1. Blob store (kalici, tum instance'lar ortak)
+  try {
+    const blob = await get(BLOB_PATH);
+    if (blob) {
+      const text = await blob.text();
+      const data = JSON.parse(text);
+      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+        if (data[k]) cfg[k] = data[k];
+      }
+    }
+  } catch (_) {}
+
+  // 2. /tmp/config.json (cache - ayni instance icin hizli)
   try {
     if (fs.existsSync(TMP_PATH)) {
       const tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
@@ -23,7 +40,7 @@ function readConfig() {
     }
   } catch (_) {}
 
-  // 3. data/config.json (git'teki son hali)
+  // 3. data/config.json (git fallback)
   try {
     const file = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
     for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
@@ -34,6 +51,31 @@ function readConfig() {
   return cfg;
 }
 
+async function writeConfig(config) {
+  const json = JSON.stringify(config, null, 2);
+
+  // 1. Blob store (kalici)
+  try {
+    await put(BLOB_PATH, json, { access: 'private', addRandomSuffix: false });
+  } catch (e) {
+    console.error('Blob write failed:', e.message);
+  }
+
+  // 2. /tmp (hizli cache)
+  try {
+    const tmpDir = path.dirname(TMP_PATH);
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+    fs.writeFileSync(TMP_PATH, json, 'utf-8');
+  } catch (_) {}
+
+  // 3. data/config.json (Vercel'de read-only)
+  try {
+    const dir = path.dirname(CONFIG_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CONFIG_PATH, json, 'utf-8');
+  } catch (_) {}
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -41,9 +83,9 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // GET: return config values (optionally filter by key)
+  // GET: return config values
   if (req.method === 'GET') {
-    const cfg = readConfig();
+    const cfg = await readConfig();
     const key = (req.url.split('?')[1] || '').replace('key=', '');
     if (key === 'all') return res.status(200).json({ success: true, config: cfg });
     if (key && cfg[key] !== undefined) {
@@ -52,19 +94,18 @@ module.exports = async (req, res) => {
     return res.status(200).json({ success: true, config: cfg });
   }
 
-  // POST: update config (authenticated via secret token)
+  // POST: update config
   if (req.method === 'POST') {
     let raw = '';
     for await (const chunk of req) raw += chunk;
     const body = JSON.parse(raw);
 
-    // Simple auth: require TELEGRAM_CONFIG_TOKEN in request
     const expectedToken = process.env.TELEGRAM_CONFIG_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
     if (body.token !== expectedToken) {
-      return res.status(401).json({ success: false, error: 'Yetkisiz erişim.' });
+      return res.status(401).json({ success: false, error: 'Yetkisiz erisim.' });
     }
 
-    const cfg = readConfig();
+    const cfg = await readConfig();
     const allowedKeys = ['iban', 'name', 'phone', 'whatsapp'];
     let changed = [];
 
@@ -76,18 +117,15 @@ module.exports = async (req, res) => {
     }
 
     if (changed.length === 0) {
-      return res.status(400).json({ success: false, error: 'Güncellenecek değer bulunamadı.' });
+      return res.status(400).json({ success: false, error: 'Guncellenecek deger bulunamadi.' });
     }
 
-    // Write to /tmp for runtime persistence
-    try { fs.writeFileSync(TMP_PATH, JSON.stringify(cfg, null, 2), 'utf-8'); } catch (_) {}
-    // Also try to write the committed file
-    try { fs.writeFileSync(CONFIG_PATH, JSON.stringify(cfg, null, 2), 'utf-8'); } catch (_) {}
+    await writeConfig(cfg);
 
     return res.status(200).json({
       success: true,
       updated: changed,
-      message: `Güncellendi: ${changed.join(', ')}`
+      message: 'Guncellendi: ' + changed.join(', ')
     });
   }
 
