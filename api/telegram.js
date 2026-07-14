@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const TMP_PATH = '/tmp/config.json';
 const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
@@ -27,6 +28,9 @@ async function blobPut(data, req) {
       headers: {
         authorization: 'Bearer ' + token,
         'x-vercel-blob-store-id': BLOB_STORE_ID,
+        'x-api-blob-request-id': crypto.randomUUID(),
+        'x-api-blob-request-attempt': '0',
+        'x-api-version': '12',
         'content-type': 'application/json',
         'x-content-length': String(Buffer.byteLength(json)),
         'x-add-random-suffix': '0',

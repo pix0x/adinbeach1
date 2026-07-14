@@ -40,6 +40,9 @@ async function blobPut(data, req) {
       headers: {
         authorization: 'Bearer ' + token,
         'x-vercel-blob-store-id': BLOB_STORE_ID,
+        'x-api-blob-request-id': require('crypto').randomUUID(),
+        'x-api-blob-request-attempt': '0',
+        'x-api-version': '12',
         'content-type': 'application/json',
         'x-content-length': String(Buffer.byteLength(json)),
         'x-add-random-suffix': '0',
