@@ -188,6 +188,6 @@ module.exports = async (req, res) => {
     return res.status(200).json({ ok: true });
 
   } catch (err) {
-    return res.status(200).json({ ok: true, error: err.message });
+    return res.status(200).json({ ok: true, error: err.message, stack: err.stack ? err.stack.split('\n')[0] : '' });
   }
 };

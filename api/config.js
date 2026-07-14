@@ -24,9 +24,13 @@ async function blobGet(req) {
         'x-vercel-blob-store-id': BLOB_STORE_ID,
       },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      var bodyText = await res.text();
+      console.error('blobGet: HTTP ' + res.status + ' ' + bodyText.slice(0,300));
+      return null;
+    }
     return await res.json();
-  } catch (_) { return null; }
+  } catch (e) { console.error('blobGet exception:', e.message); return null; }
 }
 
 async function blobPut(data, req) {
