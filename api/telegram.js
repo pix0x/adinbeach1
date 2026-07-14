@@ -3,11 +3,12 @@ const path = require('path');
 
 const TMP_PATH = '/tmp/config.json';
 const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
+const STATE_PATH = '/tmp/telegram_states.json';
 
 function readConfig() {
   try { if (fs.existsSync(TMP_PATH)) return JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8')); } catch (_) {}
   try { return JSON.parse(fs.readFileSync(CFG_PATH, 'utf-8')); } catch (_) {}
-  return { iban: '', phone: '', whatsapp: '' };
+  return { iban: '', name: '', phone: '', whatsapp: '' };
 }
 
 function writeConfig(config) {
@@ -20,6 +21,19 @@ function writeConfig(config) {
     fs.writeFileSync(TMP_PATH, json, 'utf-8');
   } catch (_) {}
   fs.writeFileSync(CFG_PATH, json, 'utf-8');
+}
+
+function readState() {
+  try { return JSON.parse(fs.readFileSync(STATE_PATH, 'utf-8')); } catch (_) {}
+  return {};
+}
+
+function writeState(state) {
+  try {
+    const dir = path.dirname(STATE_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(STATE_PATH, JSON.stringify(state), 'utf-8');
+  } catch (_) {}
 }
 
 module.exports = async (req, res) => {
@@ -41,7 +55,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
-    const chatId = message.chat.id;
+    const chatId = String(message.chat.id);
     const text = message.text.trim();
     const token = process.env.TELEGRAM_BOT_TOKEN || '';
 
@@ -50,12 +64,23 @@ module.exports = async (req, res) => {
     }
 
     const config = readConfig();
+    const states = readState();
+    const pending = states[chatId];
     let reply = '';
 
-    if (text.startsWith('/start')) {
+    // --- İki adımlı akış: IBAN kaydedildikten sonra isim bekleniyor ---
+    if (pending && pending.action === 'awaiting_name' && !text.startsWith('/')) {
+      config.name = text;
+      writeConfig(config);
+      delete states[chatId];
+      writeState(states);
+      reply = `Hesap sahibi kaydedildi:\n<b>${text}</b>\n\nIBAN ve isim bilgisi güncellendi.`;
+    }
+
+    else if (text.startsWith('/start')) {
       reply = 'Merhaba! Ben Adin Beach Hotel botuyum.\n\n';
       reply += 'Kullanılabilir komutlar:\n';
-      reply += '/iban - IBAN bilgisini göster veya güncelle\n';
+      reply += '/iban - IBAN ve hesap sahibi bilgisini göster veya güncelle\n';
       reply += '/tel - Telefon numarasını göster veya güncelle\n';
       reply += '/whatsapp - WhatsApp numarasını göster veya güncelle\n';
       reply += '/config - Tüm yapılandırmayı göster';
@@ -64,6 +89,7 @@ module.exports = async (req, res) => {
     else if (text.startsWith('/config')) {
       reply = '<b>Mevcut Yapılandırma</b>\n\n';
       reply += `<b>IBAN:</b> ${config.iban || '(ayarlanmamış)'}\n`;
+      reply += `<b>Hesap Sahibi:</b> ${config.name || '(belirtilmemiş)'}\n`;
       reply += `<b>Telefon:</b> ${config.phone || '(ayarlanmamış)'}\n`;
       reply += `<b>WhatsApp:</b> ${config.whatsapp || '(ayarlanmamış)'}`;
     }
@@ -71,12 +97,16 @@ module.exports = async (req, res) => {
     else if (text.startsWith('/iban')) {
       const val = text.replace('/iban', '').trim();
       if (!val) {
-        reply = `<b>IBAN:</b> ${config.iban || '(ayarlanmamış)'}\n\n`;
-        reply += 'Güncellemek için:\n<code>/iban TRxx xxxx xxxx xxxx xxxx xxxx xx</code>';
+        reply = `<b>IBAN:</b> ${config.iban || '(ayarlanmamış)'}\n`;
+        reply += `<b>Hesap Sahibi:</b> ${config.name || '(belirtilmemiş)'}\n\n`;
+        reply += 'Güncellemek için:\n<code>/iban TRxx xxxx xxxx xxxx xxxx xxxx xx</code>\n\nIBAN girdikten sonra hesap sahibinin adını da yazmanız istenecek.';
       } else {
         config.iban = val;
         writeConfig(config);
-        reply = `IBAN güncellendi:\n<code>${val}</code>`;
+        // İsim sorma durumuna geç
+        states[chatId] = { action: 'awaiting_name' };
+        writeState(states);
+        reply = `IBAN güncellendi:\n<code>${val}</code>\n\nŞimdi <b>hesap sahibinin adını ve soyadını</b> yazın:`;
       }
     }
 
@@ -104,8 +134,20 @@ module.exports = async (req, res) => {
       }
     }
 
+    else if (text.startsWith('/isim')) {
+      const val = text.replace('/isim', '').trim();
+      if (!val) {
+        reply = `<b>Hesap Sahibi:</b> ${config.name || '(belirtilmemiş)'}\n\n`;
+        reply += 'Güncellemek için:\n<code>/isim Ad Soyad</code>';
+      } else {
+        config.name = val;
+        writeConfig(config);
+        reply = `Hesap sahibi güncellendi:\n<b>${val}</b>`;
+      }
+    }
+
     else {
-      reply = 'Bilinmeyen komut. Kullanılabilir komutlar: /iban, /tel, /whatsapp, /config';
+      reply = 'Bilinmeyen komut. Kullanılabilir komutlar: /iban, /tel, /whatsapp, /isim, /config';
     }
 
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
