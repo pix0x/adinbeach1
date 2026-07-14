@@ -5,16 +5,33 @@ const CONFIG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const TMP_PATH = '/tmp/config.json';
 
 function readConfig() {
-  // Try /tmp first (Telegram updates), fallback to committed file
+  // 1. Env var'lardan oku (kalıcı)
+  const cfg = {
+    iban: process.env.CONFIG_IBAN || '',
+    name: process.env.CONFIG_NAME || '',
+    phone: process.env.CONFIG_PHONE || '',
+    whatsapp: process.env.CONFIG_WHATSAPP || '',
+  };
+
+  // 2. /tmp/config.json (Telegram runtime güncellemeleri)
   try {
     if (fs.existsSync(TMP_PATH)) {
-      return JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
+      const tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
+      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+        if (tmp[k]) cfg[k] = tmp[k];
+      }
     }
   } catch (_) {}
+
+  // 3. data/config.json (git'teki son hali)
   try {
-    return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
+    const file = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
+    for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+      if (!cfg[k] && file[k]) cfg[k] = file[k];
+    }
   } catch (_) {}
-  return { iban: '', phone: '', whatsapp: '' };
+
+  return cfg;
 }
 
 module.exports = async (req, res) => {

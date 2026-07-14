@@ -6,9 +6,33 @@ const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const STATE_PATH = '/tmp/telegram_states.json';
 
 function readConfig() {
-  try { if (fs.existsSync(TMP_PATH)) return JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8')); } catch (_) {}
-  try { return JSON.parse(fs.readFileSync(CFG_PATH, 'utf-8')); } catch (_) {}
-  return { iban: '', name: '', phone: '', whatsapp: '' };
+  // 1. Env var'lardan oku (kalıcı)
+  const cfg = {
+    iban: process.env.CONFIG_IBAN || '',
+    name: process.env.CONFIG_NAME || '',
+    phone: process.env.CONFIG_PHONE || '',
+    whatsapp: process.env.CONFIG_WHATSAPP || '',
+  };
+
+  // 2. /tmp/config.json (Telegram runtime güncellemeleri)
+  try {
+    if (fs.existsSync(TMP_PATH)) {
+      const tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
+      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+        if (tmp[k]) cfg[k] = tmp[k];
+      }
+    }
+  } catch (_) {}
+
+  // 3. data/config.json (git'teki son hali)
+  try {
+    const file = JSON.parse(fs.readFileSync(CFG_PATH, 'utf-8'));
+    for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+      if (!cfg[k] && file[k]) cfg[k] = file[k];
+    }
+  } catch (_) {}
+
+  return cfg;
 }
 
 function writeConfig(config) {
