@@ -73,7 +73,7 @@ async function blobPut(data) {
       addRandomSuffix: false,
       contentType: 'application/json',
     });
-  } catch (e) { console.error('SDK cfgBlobPut error: ' + (e.message || e)); }
+  } catch (e) { console.error('SDKerrCfg=' + (e.message || e).slice(0,300)); }
 }
 
 module.exports = async (req, res) => {

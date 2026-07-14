@@ -30,7 +30,7 @@ async function blobPut(data) {
       addRandomSuffix: false,
       contentType: 'application/json',
     });
-  } catch (e) { console.error('SDK blobPut error: ' + (e.message || e)); }
+  } catch (e) { console.error('SDKerr=' + (e.message || e).slice(0,300)); }
 }
 
 // ---
