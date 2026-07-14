@@ -1,10 +1,52 @@
 const fs = require('fs');
 const path = require('path');
-const { get, put } = require('@vercel/blob');
 
 const CONFIG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const TMP_PATH = '/tmp/config.json';
-const BLOB_PATH = 'config.json';
+
+// Blob REST API (Vercel Blob - tum instance'lar arasi kalici depolama)
+const BLOB_STORE_ID = process.env.BLOB_STORE_ID;
+const BLOB_API = process.env.VERCEL_BLOB_API_URL || 'https://vercel.com/api/blob';
+
+function getOidcToken(req) {
+  var h = req ? req.headers['x-vercel-oidc-token'] : undefined;
+  return h || process.env.VERCEL_OIDC_TOKEN;
+}
+
+async function blobGet(req) {
+  if (!BLOB_STORE_ID) return null;
+  var token = getOidcToken(req);
+  if (!token) return null;
+  try {
+    var res = await fetch(BLOB_API + '/?pathname=config.json', {
+      headers: {
+        authorization: 'Bearer ' + token,
+        'x-vercel-blob-store-id': BLOB_STORE_ID,
+      },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (_) { return null; }
+}
+
+async function blobPut(data, req) {
+  if (!BLOB_STORE_ID) return;
+  var token = getOidcToken(req);
+  if (!token) return;
+  try {
+    var json = JSON.stringify(data);
+    await fetch(BLOB_API + '/?pathname=config.json&x-add-random-suffix=false', {
+      method: 'PUT',
+      headers: {
+        authorization: 'Bearer ' + token,
+        'x-vercel-blob-store-id': BLOB_STORE_ID,
+        'content-type': 'application/json',
+        'x-content-length': String(Buffer.byteLength(json)),
+      },
+      body: json,
+    });
+  } catch (_) {}
+}
 
 function getDefaults() {
   return {
@@ -15,63 +57,49 @@ function getDefaults() {
   };
 }
 
-async function readConfig() {
-  const cfg = getDefaults();
+async function readConfig(req) {
+  var cfg = getDefaults();
 
-  // 1. Blob store (kalici, tum instance'lar ortak)
-  try {
-    const blob = await get(BLOB_PATH);
-    if (blob) {
-      const text = await blob.text();
-      const data = JSON.parse(text);
-      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
-        if (data[k]) cfg[k] = data[k];
-      }
-    }
-  } catch (_) {}
+  // 1. Blob store (kalici)
+  var bd = await blobGet(req);
+  if (bd) {
+    for (var k of ['iban', 'name', 'phone', 'whatsapp']) { if (bd[k]) cfg[k] = bd[k]; }
+  }
 
-  // 2. /tmp/config.json (cache - ayni instance icin hizli)
+  // 2. /tmp (cache)
   try {
     if (fs.existsSync(TMP_PATH)) {
-      const tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
-      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
-        if (tmp[k]) cfg[k] = tmp[k];
-      }
+      var tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
+      for (var k of ['iban', 'name', 'phone', 'whatsapp']) { if (tmp[k]) cfg[k] = tmp[k]; }
     }
   } catch (_) {}
 
   // 3. data/config.json (git fallback)
   try {
-    const file = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
-    for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
-      if (!cfg[k] && file[k]) cfg[k] = file[k];
-    }
+    var f = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
+    for (var k of ['iban', 'name', 'phone', 'whatsapp']) { if (!cfg[k] && f[k]) cfg[k] = f[k]; }
   } catch (_) {}
 
   return cfg;
 }
 
-async function writeConfig(config) {
-  const json = JSON.stringify(config, null, 2);
+async function writeConfig(config, req) {
+  // 1. Blob (kalici)
+  await blobPut(config, req);
 
-  // 1. Blob store (kalici)
+  // 2. /tmp (cache)
   try {
-    await put(BLOB_PATH, json, { access: 'private', addRandomSuffix: false });
-  } catch (e) {
-    console.error('Blob write failed:', e.message);
-  }
-
-  // 2. /tmp (hizli cache)
-  try {
-    const tmpDir = path.dirname(TMP_PATH);
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+    var json = JSON.stringify(config, null, 2);
+    var d = path.dirname(TMP_PATH);
+    if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
     fs.writeFileSync(TMP_PATH, json, 'utf-8');
   } catch (_) {}
 
-  // 3. data/config.json (Vercel'de read-only)
+  // 3. data/config.json
   try {
-    const dir = path.dirname(CONFIG_PATH);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    var json = JSON.stringify(config, null, 2);
+    var d = path.dirname(CONFIG_PATH);
+    if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
     fs.writeFileSync(CONFIG_PATH, json, 'utf-8');
   } catch (_) {}
 }
@@ -84,47 +112,37 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method === 'GET') {
-    const cfg = await readConfig();
-    const key = (req.url.split('?')[1] || '').replace('key=', '');
+    var cfg = await readConfig(req);
+    var key = (req.url.split('?')[1] || '').replace('key=', '');
     if (key === 'all') return res.status(200).json({ success: true, config: cfg });
-    if (key && cfg[key] !== undefined) {
-      return res.status(200).json({ success: true, key, value: cfg[key] });
-    }
+    if (key && cfg[key] !== undefined) return res.status(200).json({ success: true, key: key, value: cfg[key] });
     return res.status(200).json({ success: true, config: cfg });
   }
 
   if (req.method === 'POST') {
-    let raw = '';
-    for await (const chunk of req) raw += chunk;
-    const body = JSON.parse(raw);
+    var raw = '';
+    for await (var chunk of req) raw += chunk;
+    var body = JSON.parse(raw);
 
-    const expectedToken = process.env.TELEGRAM_CONFIG_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
-    if (body.token !== expectedToken) {
-      return res.status(401).json({ success: false, error: 'Yetkisiz erisim.' });
-    }
+    var expectedToken = process.env.TELEGRAM_CONFIG_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+    if (body.token !== expectedToken) return res.status(401).json({ success: false, error: 'Yetkisiz erisim.' });
 
-    const cfg = await readConfig();
-    const allowedKeys = ['iban', 'name', 'phone', 'whatsapp'];
-    let changed = [];
+    var cfg = await readConfig(req);
+    var allowedKeys = ['iban', 'name', 'phone', 'whatsapp'];
+    var changed = [];
 
-    for (const k of allowedKeys) {
+    for (var k of allowedKeys) {
       if (body[k] !== undefined && typeof body[k] === 'string') {
         cfg[k] = body[k].trim();
         changed.push(k);
       }
     }
 
-    if (changed.length === 0) {
-      return res.status(400).json({ success: false, error: 'Guncellenecek deger bulunamadi.' });
-    }
+    if (changed.length === 0) return res.status(400).json({ success: false, error: 'Guncellenecek deger bulunamadi.' });
 
-    await writeConfig(cfg);
+    await writeConfig(cfg, req);
 
-    return res.status(200).json({
-      success: true,
-      updated: changed,
-      message: 'Guncellendi: ' + changed.join(', ')
-    });
+    return res.status(200).json({ success: true, updated: changed, message: 'Guncellendi: ' + changed.join(', ') });
   }
 
   return res.status(405).json({ success: false, error: 'Method not allowed' });
