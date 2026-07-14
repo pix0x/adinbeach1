@@ -1,39 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { put, get } = require('@vercel/blob');
 
 const TMP_PATH = '/tmp/config.json';
 const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const STATE_PATH = '/tmp/telegram_states.json';
-
-async function blobGet() {
-  try {
-    var blob = await get('config.json', { access: 'public' });
-    if (!blob || !blob.stream) return null;
-    var reader = blob.stream.getReader();
-    var decoder = new TextDecoder();
-    var chunks = [];
-    while (true) {
-      var { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(decoder.decode(value, { stream: true }));
-    }
-    chunks.push(decoder.decode());
-    return JSON.parse(chunks.join(''));
-  } catch (_) { return null; }
-}
-
-async function blobPut(data) {
-  try {
-    await put('config.json', JSON.stringify(data), {
-      access: 'public',
-      addRandomSuffix: false,
-      contentType: 'application/json',
-    });
-  } catch (e) { console.error('SDKerr=' + (e.message || e).slice(0,300)); }
-}
-
-// ---
 
 function readConfig() {
   try {
@@ -100,7 +70,6 @@ module.exports = async (req, res) => {
     if (pending && pending.action === 'awaiting_name' && !text.startsWith('/')) {
       config.name = text;
       writeConfigLocal(config);
-      await blobPut(config);
       delete states[chatId];
       writeState(states);
       reply = 'Hesap sahibi kaydedildi:\n<b>' + text + '</b>\n\nIBAN ve isim bilgisi guncellendi.';
@@ -115,7 +84,6 @@ module.exports = async (req, res) => {
       } else {
         config.iban = val;
         writeConfigLocal(config);
-        await blobPut(config);
         states[chatId] = { action: 'awaiting_name' };
         writeState(states);
         reply = 'IBAN guncellendi:\n<code>' + val + '</code>\n\nSimdi <b>hesap sahibinin adini ve soyadini</b> yazin:';
@@ -127,7 +95,6 @@ module.exports = async (req, res) => {
       } else {
         config.phone = val;
         writeConfigLocal(config);
-        await blobPut(config);
         reply = 'Telefon guncellendi:\n' + val;
       }
     } else if (text.startsWith('/whatsapp')) {
@@ -137,7 +104,6 @@ module.exports = async (req, res) => {
       } else {
         config.whatsapp = val;
         writeConfigLocal(config);
-        await blobPut(config);
         reply = 'WhatsApp guncellendi:\n' + val;
       }
     } else if (text.startsWith('/isim')) {
@@ -147,7 +113,6 @@ module.exports = async (req, res) => {
       } else {
         config.name = val;
         writeConfigLocal(config);
-        await blobPut(config);
         reply = 'Hesap sahibi guncellendi:\n<b>' + val + '</b>';
       }
     } else {
