@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@vercel/blob": "^2.6.1",
-    "@vercel/oidc": "^3.8.0"
-  }
-}
