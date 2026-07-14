@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
     }
 
     const cfg = readConfig();
-    const allowedKeys = ['iban', 'phone', 'whatsapp'];
+    const allowedKeys = ['iban', 'name', 'phone', 'whatsapp'];
     let changed = [];
 
     for (const k of allowedKeys) {

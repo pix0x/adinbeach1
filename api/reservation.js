@@ -6,7 +6,7 @@ function readConfig() {
   const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
   try { if (fs.existsSync(TMP_PATH)) return JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8')); } catch (_) {}
   try { return JSON.parse(fs.readFileSync(CFG_PATH, 'utf-8')); } catch (_) {}
-  return { iban: '', phone: '', whatsapp: '' };
+  return { iban: '', name: '', phone: '', whatsapp: '' };
 }
 
 module.exports = async (req, res) => {
@@ -71,7 +71,10 @@ module.exports = async (req, res) => {
       if (telefon) msg += `<b>📞 Telefon:</b> ${telefon}\n`;
       msg += `<b>💳 Ödeme:</b> ${isHavale ? 'Havale/EFT' : 'Kredi Kartı'}\n`;
       if (toplamTutar > 0) msg += `<b>💰 Tutar:</b> ${toplamTutar.toLocaleString('tr-TR')} TL\n`;
-      if (isHavale && config.iban) msg += `\n<b>🏦 IBAN:</b> ${config.iban}\n`;
+      if (isHavale && config.iban) {
+        msg += `\n<b>🏦 IBAN:</b> ${config.iban}\n`;
+        if (config.name) msg += `<b>👤 Hesap Sahibi:</b> ${config.name}\n`;
+      }
       if (notlar)  msg += `\n<b>📝 Not:</b>\n${notlar}\n`;
       if (config.phone) msg += `\n<b>📞 Tel:</b> ${config.phone}`;
       if (config.whatsapp) msg += `\n<b>📱 WhatsApp:</b> ${config.whatsapp}`;
