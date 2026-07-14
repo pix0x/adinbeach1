@@ -44,7 +44,7 @@ async function blobPut(data, req) {
         'x-api-blob-request-attempt': '0',
         'x-api-version': '12',
         'x-vercel-blob-access': 'public',
-        'content-type': 'application/json',
+        'x-content-type': 'application/json',
         'x-content-length': String(Buffer.byteLength(json)),
         'x-add-random-suffix': '0',
       },

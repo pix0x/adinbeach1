@@ -30,14 +30,15 @@ async function blobPut(data, req) {
         'x-api-version': '12',
         'x-vercel-blob-access': 'public',
         'content-type': 'application/json',
+        'x-content-type': 'application/json',
         'x-content-length': String(Buffer.byteLength(json)),
         'x-add-random-suffix': '0',
       },
       body: json,
     });
     if (!res.ok) {
-      var bodyText = await res.text();
-      console.error('blobPut: HTTP ' + res.status + ' ' + bodyText);
+      var bodyText = (await res.text()) || '';
+      console.error('blobPut: HTTP ' + res.status + ' statusText=' + res.statusText + ' len=' + bodyText.length + ' body=' + bodyText.slice(0,500));
     }
   } catch (e) { console.error('blobPut exception:', e.message); }
 }
