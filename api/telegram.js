@@ -52,13 +52,17 @@ async function readConfig() {
   return cfg;
 }
 
+let lastBlobError = '';
+
 async function writeConfig(config) {
   const json = JSON.stringify(config, null, 2);
 
   // 1. Blob store (kalici)
   try {
+    lastBlobError = '';
     await put(BLOB_PATH, json, { access: 'private', addRandomSuffix: false });
   } catch (e) {
+    lastBlobError = e.message;
     console.error('Blob write failed:', e.message);
   }
 
@@ -100,6 +104,7 @@ module.exports = async (req, res) => {
   }
 
   try {
+    lastBlobError = '';
     let raw = '';
     for await (const chunk of req) raw += chunk;
     const update = JSON.parse(raw);
@@ -209,9 +214,11 @@ module.exports = async (req, res) => {
       body: JSON.stringify({ chat_id: chatId, text: reply, parse_mode: 'HTML' }),
     });
 
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, blobError: lastBlobError || undefined });
 
   } catch (err) {
     return res.status(200).json({ ok: true, error: err.message });
+  } finally {
+    lastBlobError = '';
   }
 };
