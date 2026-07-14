@@ -21,7 +21,7 @@ async function blobPut(data, req) {
   if (!token) { console.error('blobPut: no OIDC token'); return; }
   try {
     var json = JSON.stringify(data);
-    var url = BLOB_API + '/?pathname=config.json&x-add-random-suffix=false';
+    var url = BLOB_API + '/?pathname=config.json';
     var res = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -29,6 +29,7 @@ async function blobPut(data, req) {
         'x-vercel-blob-store-id': BLOB_STORE_ID,
         'content-type': 'application/json',
         'x-content-length': String(Buffer.byteLength(json)),
+        'x-add-random-suffix': '0',
       },
       body: json,
     });

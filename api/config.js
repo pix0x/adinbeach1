@@ -35,13 +35,14 @@ async function blobPut(data, req) {
   if (!token) return;
   try {
     var json = JSON.stringify(data);
-    await fetch(BLOB_API + '/?pathname=config.json&x-add-random-suffix=false', {
+    await fetch(BLOB_API + '/?pathname=config.json', {
       method: 'PUT',
       headers: {
         authorization: 'Bearer ' + token,
         'x-vercel-blob-store-id': BLOB_STORE_ID,
         'content-type': 'application/json',
         'x-content-length': String(Buffer.byteLength(json)),
+        'x-add-random-suffix': '0',
       },
       body: json,
     });
