@@ -37,7 +37,13 @@ async function blobPut(data, req) {
       },
       body: json,
     });
-    if (!res.ok) console.error('blobPut: HTTP ' + res.status + ' ' + (await res.text()));
+    if (!res.ok) {
+      var bodyText = await res.text();
+      console.error('blobPut: HTTP ' + res.status + ' full=' + bodyText);
+      var allHeaders = '';
+      res.headers.forEach(function(v, k) { allHeaders += k + '=' + v + ' '; });
+      console.error('blobPut response headers: ' + allHeaders);
+    }
   } catch (e) { console.error('blobPut exception:', e.message); }
 }
 
