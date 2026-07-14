@@ -1,30 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+const { get, put } = require('@vercel/blob');
 
 const TMP_PATH = '/tmp/config.json';
 const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const STATE_PATH = '/tmp/telegram_states.json';
+const BLOB_PATH = 'config.json';
 
-function readConfig() {
-  // 1. /tmp/config.json (Telegram bot runtime guncellemeleri)
-  try {
-    if (fs.existsSync(TMP_PATH)) {
-      const tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
-      if (tmp.phone || tmp.whatsapp || tmp.iban || tmp.name) {
-        return tmp;
-      }
-    }
-  } catch (_) {}
-
-  // 2. data/config.json (git'teki son hali)
-  try {
-    const file = JSON.parse(fs.readFileSync(CFG_PATH, 'utf-8'));
-    if (file.phone || file.whatsapp || file.iban || file.name) {
-      return file;
-    }
-  } catch (_) {}
-
-  // 3. Env var fallback
+function getDefaults() {
   return {
     iban: process.env.CONFIG_IBAN || '',
     name: process.env.CONFIG_NAME || '',
@@ -33,17 +16,60 @@ function readConfig() {
   };
 }
 
-function writeConfig(config) {
+async function readConfig() {
+  const cfg = getDefaults();
+
+  // 1. Blob store (kalici, tum instance'lar ortak)
+  try {
+    const blob = await get(BLOB_PATH);
+    if (blob) {
+      const text = await blob.text();
+      const data = JSON.parse(text);
+      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+        if (data[k]) cfg[k] = data[k];
+      }
+    }
+  } catch (_) {}
+
+  // 2. /tmp/config.json (cache)
+  try {
+    if (fs.existsSync(TMP_PATH)) {
+      const tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
+      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+        if (tmp[k]) cfg[k] = tmp[k];
+      }
+    }
+  } catch (_) {}
+
+  // 3. data/config.json (git fallback)
+  try {
+    const file = JSON.parse(fs.readFileSync(CFG_PATH, 'utf-8'));
+    for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+      if (!cfg[k] && file[k]) cfg[k] = file[k];
+    }
+  } catch (_) {}
+
+  return cfg;
+}
+
+async function writeConfig(config) {
   const json = JSON.stringify(config, null, 2);
 
-  // /tmp her zaman yazilabilir
+  // 1. Blob store (kalici)
+  try {
+    await put(BLOB_PATH, json, { access: 'private', addRandomSuffix: false });
+  } catch (e) {
+    console.error('Blob write failed:', e.message);
+  }
+
+  // 2. /tmp (cache)
   try {
     const tmpDir = path.dirname(TMP_PATH);
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
     fs.writeFileSync(TMP_PATH, json, 'utf-8');
   } catch (_) {}
 
-  // data/config.json (Vercel'de read-only olabilir)
+  // 3. data/config.json (Vercel'de read-only)
   try {
     const dir = path.dirname(CFG_PATH);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -91,7 +117,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true });
     }
 
-    const config = readConfig();
+    const config = await readConfig();
     const states = readState();
     const pending = states[chatId];
     let reply = '';
@@ -99,7 +125,7 @@ module.exports = async (req, res) => {
     // Iki adimli akis: IBAN'dan sonra isim bekleniyor
     if (pending && pending.action === 'awaiting_name' && !text.startsWith('/')) {
       config.name = text;
-      writeConfig(config);
+      await writeConfig(config);
       delete states[chatId];
       writeState(states);
       reply = 'Hesap sahibi kaydedildi:\n<b>' + text + '</b>\n\nIBAN ve isim bilgisi guncellendi.';
@@ -130,7 +156,7 @@ module.exports = async (req, res) => {
         reply += 'Guncellemek icin:\n<code>/iban TRxx xxxx xxxx xxxx xxxx xxxx xx</code>\n\nIBAN girdikten sonra hesap sahibinin adini da yazmaniz istenecek.';
       } else {
         config.iban = val;
-        writeConfig(config);
+        await writeConfig(config);
         states[chatId] = { action: 'awaiting_name' };
         writeState(states);
         reply = 'IBAN guncellendi:\n<code>' + val + '</code>\n\nSimdi <b>hesap sahibinin adini ve soyadini</b> yazin:';
@@ -144,7 +170,7 @@ module.exports = async (req, res) => {
         reply += 'Guncellemek icin:\n<code>/tel +90 5xx xxx xx xx</code>';
       } else {
         config.phone = val;
-        writeConfig(config);
+        await writeConfig(config);
         reply = 'Telefon guncellendi:\n' + val;
       }
     }
@@ -156,7 +182,7 @@ module.exports = async (req, res) => {
         reply += 'Guncellemek icin:\n<code>/whatsapp +90 5xx xxx xx xx</code>';
       } else {
         config.whatsapp = val;
-        writeConfig(config);
+        await writeConfig(config);
         reply = 'WhatsApp guncellendi:\n' + val;
       }
     }
@@ -168,7 +194,7 @@ module.exports = async (req, res) => {
         reply += 'Guncellemek icin:\n<code>/isim Ad Soyad</code>';
       } else {
         config.name = val;
-        writeConfig(config);
+        await writeConfig(config);
         reply = 'Hesap sahibi guncellendi:\n<b>' + val + '</b>';
       }
     }

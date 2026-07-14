@@ -1,30 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const { get, put } = require('@vercel/blob');
 
 const CONFIG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const TMP_PATH = '/tmp/config.json';
+const BLOB_PATH = 'config.json';
 
-function readConfig() {
-  // 1. /tmp/config.json (Telegram bot runtime guncellemeleri, instance-local)
-  //    Bot yazinca ayni instance'dan okunursa guncel deger gelir
-  try {
-    if (fs.existsSync(TMP_PATH)) {
-      const tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
-      if (tmp.phone || tmp.whatsapp || tmp.iban || tmp.name) {
-        return tmp;
-      }
-    }
-  } catch (_) {}
-
-  // 2. data/config.json (git'teki son hali - her instance'ta ayni)
-  try {
-    const file = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
-    if (file.phone || file.whatsapp || file.iban || file.name) {
-      return file;
-    }
-  } catch (_) {}
-
-  // 3. Env var fallback (hicbiri yoksa)
+function getDefaults() {
   return {
     iban: process.env.CONFIG_IBAN || '',
     name: process.env.CONFIG_NAME || '',
@@ -33,17 +15,60 @@ function readConfig() {
   };
 }
 
-function writeConfig(config) {
+async function readConfig() {
+  const cfg = getDefaults();
+
+  // 1. Blob store (kalici, tum instance'lar ortak)
+  try {
+    const blob = await get(BLOB_PATH);
+    if (blob) {
+      const text = await blob.text();
+      const data = JSON.parse(text);
+      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+        if (data[k]) cfg[k] = data[k];
+      }
+    }
+  } catch (_) {}
+
+  // 2. /tmp/config.json (cache - ayni instance icin hizli)
+  try {
+    if (fs.existsSync(TMP_PATH)) {
+      const tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
+      for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+        if (tmp[k]) cfg[k] = tmp[k];
+      }
+    }
+  } catch (_) {}
+
+  // 3. data/config.json (git fallback)
+  try {
+    const file = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
+    for (const k of ['iban', 'name', 'phone', 'whatsapp']) {
+      if (!cfg[k] && file[k]) cfg[k] = file[k];
+    }
+  } catch (_) {}
+
+  return cfg;
+}
+
+async function writeConfig(config) {
   const json = JSON.stringify(config, null, 2);
 
-  // /tmp her zaman yazilabilir (Vercel serverless)
+  // 1. Blob store (kalici)
+  try {
+    await put(BLOB_PATH, json, { access: 'private', addRandomSuffix: false });
+  } catch (e) {
+    console.error('Blob write failed:', e.message);
+  }
+
+  // 2. /tmp (hizli cache)
   try {
     const tmpDir = path.dirname(TMP_PATH);
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
     fs.writeFileSync(TMP_PATH, json, 'utf-8');
   } catch (_) {}
 
-  // data/config.json yazilamazsa sorun degil (Vercel'de read-only)
+  // 3. data/config.json (Vercel'de read-only)
   try {
     const dir = path.dirname(CONFIG_PATH);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -58,9 +83,8 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // GET: config degerlerini getir
   if (req.method === 'GET') {
-    const cfg = readConfig();
+    const cfg = await readConfig();
     const key = (req.url.split('?')[1] || '').replace('key=', '');
     if (key === 'all') return res.status(200).json({ success: true, config: cfg });
     if (key && cfg[key] !== undefined) {
@@ -69,7 +93,6 @@ module.exports = async (req, res) => {
     return res.status(200).json({ success: true, config: cfg });
   }
 
-  // POST: config guncelle (Telegram bot ve uyumlu araclarla kullanilir)
   if (req.method === 'POST') {
     let raw = '';
     for await (const chunk of req) raw += chunk;
@@ -80,7 +103,7 @@ module.exports = async (req, res) => {
       return res.status(401).json({ success: false, error: 'Yetkisiz erisim.' });
     }
 
-    const cfg = readConfig();
+    const cfg = await readConfig();
     const allowedKeys = ['iban', 'name', 'phone', 'whatsapp'];
     let changed = [];
 
@@ -95,7 +118,7 @@ module.exports = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Guncellenecek deger bulunamadi.' });
     }
 
-    writeConfig(cfg);
+    await writeConfig(cfg);
 
     return res.status(200).json({
       success: true,
