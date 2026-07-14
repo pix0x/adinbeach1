@@ -39,7 +39,7 @@ async function blobPut(data, req) {
   if (!token) return;
   try {
     var json = JSON.stringify(data);
-    await fetch(BLOB_API + '/?pathname=config.json', {
+    var res = await fetch(BLOB_API + '/?pathname=config.json', {
       method: 'PUT',
       headers: {
         authorization: 'Bearer ' + token,
@@ -54,7 +54,11 @@ async function blobPut(data, req) {
       },
       body: json,
     });
-  } catch (_) {}
+    if (!res.ok) {
+      var bodyText = await res.text();
+      console.error('cfgBlobPut: status=' + res.status + ' body=' + bodyText.slice(0,300));
+    }
+  } catch (e) { console.error('cfgBlobPut exception:', e.message); }
 }
 
 function getDefaults() {

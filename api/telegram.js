@@ -38,7 +38,8 @@ async function blobPut(data, req) {
     });
     if (!res.ok) {
       var bodyText = (await res.text()) || '';
-      console.error('blobPut: HTTP ' + res.status + ' statusText=' + res.statusText + ' len=' + bodyText.length + ' body=' + bodyText.slice(0,500));
+      console.error('blobPut: status=' + res.status + ' body=' + bodyText.slice(0,200));
+      return; // don't block the response
     }
   } catch (e) { console.error('blobPut exception:', e.message); }
 }
