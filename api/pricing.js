@@ -44,7 +44,8 @@ const PRICING = {
     earlyBooking: [
       { minDaysAhead: 60, rate: 0.88, label: '%12 Erken Rezervasyon İndirimi (60+ gün)' },
       { minDaysAhead: 30, rate: 0.93, label: '%7 Erken Rezervasyon İndirimi (30+ gün)' }
-    ]
+    ],
+    havale: { rate: 0.85, label: '%15 Havale İndirimi' }
   }
 };
 
@@ -91,6 +92,7 @@ module.exports = async (req, res) => {
     const cikisStr = (body.cikis  || '').trim();
     const yetiskin = parseInt(body.yetiskin_sayisi || body.yetiskin || 2);
     const cocuk    = parseInt(body.cocuk_sayisi || body.cocuk || 0);
+    const paymentMethod = (body.payment_method || 'credit').trim().toLowerCase();
 
     if (!odaId)  return res.status(400).json({ success: false, error: 'Oda tipi seçiniz.' });
     if (!girisStr || !cikisStr) return res.status(400).json({ success: false, error: 'Giriş ve çıkış tarihlerini seçiniz.' });
@@ -158,6 +160,12 @@ module.exports = async (req, res) => {
       }
     }
 
+    const isHavale = paymentMethod === 'havale' || paymentMethod === 'transfer';
+    if (isHavale && PRICING.discounts.havale.rate < discountRate) {
+      discountRate = PRICING.discounts.havale.rate;
+      appliedDiscounts.push(PRICING.discounts.havale.label);
+    }
+
     const discountAmount = Math.round(totalBeforeDiscount * (1 - discountRate));
     const totalPrice = Math.round(totalBeforeDiscount * discountRate);
 
@@ -168,6 +176,7 @@ module.exports = async (req, res) => {
       dates: { checkIn: girisStr, checkOut: cikisStr, nights },
       guests: { adults: yetiskin, children: cocuk, baseGuests: PRICING.baseGuests },
       season: primarySeason,
+      paymentMethod: paymentMethod,
       pricing: {
         dailyCount: daily.length,
         subtotal,
