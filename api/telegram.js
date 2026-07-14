@@ -1,46 +1,36 @@
 const fs = require('fs');
 const path = require('path');
+const { put, get } = require('@vercel/blob');
 
 const TMP_PATH = '/tmp/config.json';
 const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const STATE_PATH = '/tmp/telegram_states.json';
 
-// Vercel Blob REST API (tum instance'lar arasi kalici depolama)
-const BLOB_STORE_ID = process.env.BLOB_STORE_ID;
-const BLOB_API = process.env.VERCEL_BLOB_API_URL || 'https://vercel.com/api/blob';
-
-function getOidcToken(req) {
-  var h = req ? req.headers['x-vercel-oidc-token'] : undefined;
-  return h || process.env.VERCEL_OIDC_TOKEN;
+async function blobGet() {
+  try {
+    var blob = await get('config.json', { access: 'public' });
+    if (!blob || !blob.stream) return null;
+    var reader = blob.stream.getReader();
+    var decoder = new TextDecoder();
+    var chunks = [];
+    while (true) {
+      var { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(decoder.decode(value, { stream: true }));
+    }
+    chunks.push(decoder.decode());
+    return JSON.parse(chunks.join(''));
+  } catch (_) { return null; }
 }
 
-async function blobPut(data, req) {
-  if (!BLOB_STORE_ID) { console.error('blobPut: no BLOB_STORE_ID'); return; }
-  var token = getOidcToken(req);
-  if (!token) { console.error('blobPut: no OIDC token (header=' + JSON.stringify(req ? req.headers['x-vercel-oidc-token'] ? 'present' : 'missing' : 'no-req') + ')'); return; }
+async function blobPut(data) {
   try {
-    var json = JSON.stringify(data);
-    var res = await fetch(BLOB_API + '/?pathname=config.json', {
-      method: 'PUT',
-      headers: {
-        authorization: 'Bearer ' + token,
-        'x-vercel-blob-store-id': BLOB_STORE_ID,
-        'x-api-blob-request-id': require('crypto').randomUUID(),
-        'x-api-blob-request-attempt': '0',
-        'x-api-version': '12',
-        'x-vercel-blob-access': 'public',
-        'content-type': 'application/json',
-        'x-content-type': 'application/json',
-        'x-content-length': String(Buffer.byteLength(json)),
-        'x-add-random-suffix': '0',
-      },
-      body: json,
+    await put('config.json', JSON.stringify(data), {
+      access: 'public',
+      addRandomSuffix: false,
+      contentType: 'application/json',
     });
-    if (!res.ok) {
-      var bodyText = (await res.text()) || '';
-      console.error('blobPutErr=' + bodyText.slice(0,100));
-    }
-  } catch (e) { console.error('blobPut exception:', e.message); }
+  } catch (_) {}
 }
 
 // ---
@@ -107,75 +97,60 @@ module.exports = async (req, res) => {
     var pending = states[chatId];
     var reply = '';
 
-    // IBAN'dan sonra isim bekleme
     if (pending && pending.action === 'awaiting_name' && !text.startsWith('/')) {
       config.name = text;
       writeConfigLocal(config);
-      await blobPut(config, req);
+      await blobPut(config);
       delete states[chatId];
       writeState(states);
       reply = 'Hesap sahibi kaydedildi:\n<b>' + text + '</b>\n\nIBAN ve isim bilgisi guncellendi.';
-    }
-
-    else if (text.startsWith('/start')) {
+    } else if (text.startsWith('/start')) {
       reply = 'Merhaba! Ben Adin Beach Hotel botuyum.\n\nKullanilabilir komutlar:\n/iban - IBAN ve hesap sahibi bilgisini goster veya guncelle\n/tel - Telefon numarasini goster veya guncelle\n/whatsapp - WhatsApp numarasini goster veya guncelle\n/config - Tum yapilandirmayi goster';
-    }
-
-    else if (text.startsWith('/config')) {
+    } else if (text.startsWith('/config')) {
       reply = '<b>Mevcut Yapilandirma</b>\n\n<b>IBAN:</b> ' + (config.iban || '(ayarlanmamis)') + '\n<b>Hesap Sahibi:</b> ' + (config.name || '(belirtilmemis)') + '\n<b>Telefon:</b> ' + (config.phone || '(ayarlanmamis)') + '\n<b>WhatsApp:</b> ' + (config.whatsapp || '(ayarlanmamis)');
-    }
-
-    else if (text.startsWith('/iban')) {
+    } else if (text.startsWith('/iban')) {
       var val = text.replace('/iban', '').trim();
       if (!val) {
         reply = '<b>IBAN:</b> ' + (config.iban || '(ayarlanmamis)') + '\n<b>Hesap Sahibi:</b> ' + (config.name || '(belirtilmemis)') + '\n\nGuncellemek icin:\n<code>/iban TRxx xxxx xxxx xxxx xxxx xxxx xx</code>\n\nIBAN girdikten sonra hesap sahibinin adini da yazmaniz istenecek.';
       } else {
         config.iban = val;
         writeConfigLocal(config);
-        await blobPut(config, req);
+        await blobPut(config);
         states[chatId] = { action: 'awaiting_name' };
         writeState(states);
         reply = 'IBAN guncellendi:\n<code>' + val + '</code>\n\nSimdi <b>hesap sahibinin adini ve soyadini</b> yazin:';
       }
-    }
-
-    else if (text.startsWith('/tel')) {
+    } else if (text.startsWith('/tel')) {
       var val = text.replace('/tel', '').trim();
       if (!val) {
         reply = '<b>Telefon:</b> ' + (config.phone || '(ayarlanmamis)') + '\n\nGuncellemek icin:\n<code>/tel +90 5xx xxx xx xx</code>';
       } else {
         config.phone = val;
         writeConfigLocal(config);
-        await blobPut(config, req);
+        await blobPut(config);
         reply = 'Telefon guncellendi:\n' + val;
       }
-    }
-
-    else if (text.startsWith('/whatsapp')) {
+    } else if (text.startsWith('/whatsapp')) {
       var val = text.replace('/whatsapp', '').trim();
       if (!val) {
         reply = '<b>WhatsApp:</b> ' + (config.whatsapp || '(ayarlanmamis)') + '\n\nGuncellemek icin:\n<code>/whatsapp +90 5xx xxx xx xx</code>';
       } else {
         config.whatsapp = val;
         writeConfigLocal(config);
-        await blobPut(config, req);
+        await blobPut(config);
         reply = 'WhatsApp guncellendi:\n' + val;
       }
-    }
-
-    else if (text.startsWith('/isim')) {
+    } else if (text.startsWith('/isim')) {
       var val = text.replace('/isim', '').trim();
       if (!val) {
         reply = '<b>Hesap Sahibi:</b> ' + (config.name || '(belirtilmemis)') + '\n\nGuncellemek icin:\n<code>/isim Ad Soyad</code>';
       } else {
         config.name = val;
         writeConfigLocal(config);
-        await blobPut(config, req);
+        await blobPut(config);
         reply = 'Hesap sahibi guncellendi:\n<b>' + val + '</b>';
       }
-    }
-
-    else {
+    } else {
       reply = 'Bilinmeyen komut. Kullanilabilir komutlar: /iban, /tel, /whatsapp, /isim, /config';
     }
 
@@ -186,8 +161,7 @@ module.exports = async (req, res) => {
     });
 
     return res.status(200).json({ ok: true });
-
   } catch (err) {
-    return res.status(200).json({ ok: true, error: err.message, stack: err.stack ? err.stack.split('\n')[0] : '' });
+    return res.status(200).json({ ok: true, error: err.message });
   }
 };
