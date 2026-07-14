@@ -475,25 +475,19 @@ select.field option{background:#1a1a18;color:var(--body)}
           <input type="hidden" name="toplam_tutar" id="h_toplam_tutar" value="0">
         </div>
 
-        <!-- IBAN VE İLETİŞİM BİLGİLERİ (config'den doldurulur) -->
+        <!-- IBAN VE HESAP SAHİBİ (config'den doldurulur, sadece Havale seçilince gösterilir) -->
         <div class="info-box" id="ibanBox">
           <div class="info-row">
-            <span class="info-icon">??</span>
+            <span class="info-icon"></span>
             <div>
               <span class="info-label">IBAN:</span>
               <span class="info-value" id="ibanValue"></span>
               <button type="button" class="info-copy-btn" id="ibanCopyBtn">Kopyala</button>
             </div>
           </div>
-        </div>
-        <div class="info-box visible" id="contactBox">
-          <div class="info-row">
-            <span class="info-icon">??</span>
-            <div><span class="info-label">Telefon:</span> <span class="info-value" id="phoneValue"></span></div>
-          </div>
-          <div class="info-row">
-            <span class="info-icon">??</span>
-            <div><span class="info-label">WhatsApp:</span> <span class="info-value" id="whatsappValue"></span></div>
+          <div class="info-row" id="nameRow" style="margin-top:8px">
+            <span class="info-icon"></span>
+            <div><span class="info-label">Hesap Sahibi:</span> <span class="info-value" id="nameValue"></span></div>
           </div>
         </div>
 
@@ -581,7 +575,7 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
   btnMinus.addEventListener('click', function() { update(parseInt(display.textContent) - 1); });
 });
 
-// --- Config yükle (IBAN, telefon, WhatsApp) ---
+// --- Config yükle (IBAN, hesap sahibi adı) ---
 (function() {
   fetch('/api/config').then(function(r) { return r.json(); }).then(function(cfg) {
     if (cfg.success && cfg.config) {
@@ -590,8 +584,7 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
         document.getElementById('ibanValue').textContent = c.iban;
         document.getElementById('ibanBox').classList.add('visible');
       }
-      if (c.phone)  document.getElementById('phoneValue').textContent = c.phone;
-      if (c.whatsapp) document.getElementById('whatsappValue').textContent = c.whatsapp;
+      if (c.name) document.getElementById('nameValue').textContent = c.name;
     }
   }).catch(function() {});
 })();
