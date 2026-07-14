@@ -39,3 +39,5 @@ images/brand/favIcon.png
 *.bak2
 *pre_fix
 *pre_fix2
+
+.vercel
