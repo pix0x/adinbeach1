@@ -15,9 +15,9 @@ function getOidcToken(req) {
 }
 
 async function blobPut(data, req) {
-  if (!BLOB_STORE_ID) return;
+  if (!BLOB_STORE_ID) { console.error('blobPut: no BLOB_STORE_ID'); return; }
   var token = getOidcToken(req);
-  if (!token) return;
+  if (!token) { console.error('blobPut: no OIDC token (header=' + JSON.stringify(req ? req.headers['x-vercel-oidc-token'] ? 'present' : 'missing' : 'no-req') + ')'); return; }
   try {
     var json = JSON.stringify(data);
     var res = await fetch(BLOB_API + '/?pathname=config.json', {
