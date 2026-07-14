@@ -16,12 +16,13 @@ function getOidcToken(req) {
 }
 
 async function blobPut(data, req) {
-  if (!BLOB_STORE_ID) return;
+  if (!BLOB_STORE_ID) { console.error('blobPut: no BLOB_STORE_ID'); return; }
   var token = getOidcToken(req);
-  if (!token) return;
+  if (!token) { console.error('blobPut: no OIDC token'); return; }
   try {
     var json = JSON.stringify(data);
-    await fetch(BLOB_API + '/?pathname=config.json&x-add-random-suffix=false', {
+    var url = BLOB_API + '/?pathname=config.json&x-add-random-suffix=false';
+    var res = await fetch(url, {
       method: 'PUT',
       headers: {
         authorization: 'Bearer ' + token,
@@ -31,7 +32,8 @@ async function blobPut(data, req) {
       },
       body: json,
     });
-  } catch (_) {}
+    if (!res.ok) console.error('blobPut: HTTP ' + res.status + ' ' + (await res.text()));
+  } catch (e) { console.error('blobPut exception:', e.message); }
 }
 
 // ---
