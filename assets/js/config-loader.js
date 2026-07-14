@@ -36,22 +36,8 @@
       }
     }
 
-    // 3. Sosyal medya ikonlarının yanındaki +90 xxx ... metinlerini güncelle
-    if (c.phone) {
-      var allElements = document.querySelectorAll('a, span, div, p, li');
-      for (var i = 0; i < allElements.length; i++) {
-        var el = allElements[i];
-        // Header/contact alanlarındaki numaraları değiştir (içinde +90 geçen kısa metinler)
-        var html = el.innerHTML;
-        if (typeof html === 'string' && html.indexOf('+90') !== -1 && html.length < 200) {
-          // Sadece telefon formatındaki stringleri değiştir
-          var newHtml = html.replace(/\+\d{2,3}[\s\d\(\)\-]{7,}/g, c.phone);
-          if (newHtml !== html) {
-            el.innerHTML = newHtml;
-          }
-        }
-      }
-    }
+    // 3. Tüm <a href tel hariç) metin düğümlerindeki numaraları güncelle
+    // (step 1 zaten tel: linklerini halleder)
   }).catch(function() {
     // Config yüklenemezse sessizce geç
   });
