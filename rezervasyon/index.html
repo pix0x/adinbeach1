@@ -582,7 +582,7 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
       var c = cfg.config;
       if (c.iban) {
         document.getElementById('ibanValue').textContent = c.iban;
-        document.getElementById('ibanBox').classList.add('visible');
+        // IBAN kutusu sadece Havale seçilince görünür (varsayılan: Kredi Kartı)
       }
       if (c.name) document.getElementById('nameValue').textContent = c.name;
     }

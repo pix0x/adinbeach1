@@ -19,10 +19,18 @@
       for (var i = 0; i < telLinks.length; i++) {
         telLinks[i].href = 'tel:' + cleanPhoneVal;
         // Link içindeki metni de güncelle (telefon numarası görünen kısım)
-        var textNode = telLinks[i].childNodes;
-        for (var j = 0; j < textNode.length; j++) {
-          if (textNode[j].nodeType === 3 && /\d/.test(textNode[j].textContent)) {
-            textNode[j].textContent = textNode[j].textContent.replace(/[\d\s\(\)\+\-]{7,}/g, c.phone);
+        // İçindeki tüm text node'larını temizle, sadece telefon numarasını koy
+        var textNodes = [];
+        for (var j = 0; j < telLinks[i].childNodes.length; j++) {
+          if (telLinks[i].childNodes[j].nodeType === 3) {
+            textNodes.push(telLinks[i].childNodes[j]);
+          }
+        }
+        // En son text node'unu bul (içinde telefon numarası olan)
+        for (var j = textNodes.length - 1; j >= 0; j--) {
+          if (/\d/.test(textNodes[j].textContent)) {
+            textNodes[j].textContent = c.phone;
+            break;
           }
         }
       }
