@@ -12,15 +12,19 @@ function readConfig() {
 }
 
 function writeConfig(config) {
-  const dir = path.dirname(CFG_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   const json = JSON.stringify(config, null, 2);
+  // /tmp her zaman yazılabilir (Vercel serverless)
   try {
     const tmpDir = path.dirname(TMP_PATH);
     if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
     fs.writeFileSync(TMP_PATH, json, 'utf-8');
   } catch (_) {}
-  fs.writeFileSync(CFG_PATH, json, 'utf-8');
+  // data/config.json yazılamazsa sorun değil (Vercel'de read-only)
+  try {
+    const dir = path.dirname(CFG_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(CFG_PATH, json, 'utf-8');
+  } catch (_) {}
 }
 
 function readState() {
