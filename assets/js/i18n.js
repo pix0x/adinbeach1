@@ -26,7 +26,7 @@
       var src = scripts[0].src;
       return src.substring(0, src.lastIndexOf('/assets/js/i18n.js')) + '/lang/';
     }
-    return '/adinbeach/lang/';
+    return '/lang/';
   }
 
   var langDir = getLangDir();
@@ -236,7 +236,7 @@
     translateNode(document.body, textMap);
 
     // Breadcrumb
-    document.querySelectorAll('a[href="/adinbeach/"], nav[aria-label="breadcrumb"] a, nav[aria-label="Breadcrumb"] a').forEach(function (el) {
+    document.querySelectorAll('a[href="/"], nav[aria-label="breadcrumb"] a, nav[aria-label="Breadcrumb"] a').forEach(function (el) {
       if (el.textContent.trim() === 'Anasayfa' && textMap['Anasayfa']) {
         el.textContent = textMap['Anasayfa'];
       }
