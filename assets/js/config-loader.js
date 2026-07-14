@@ -41,6 +41,18 @@
       var waLinks = document.querySelectorAll('a[href*="wa.me/"]');
       for (var i = 0; i < waLinks.length; i++) {
         waLinks[i].href = 'https://wa.me/' + cleanWhatsappVal;
+        var wnTextNodes = [];
+        for (var j = 0; j < waLinks[i].childNodes.length; j++) {
+          if (waLinks[i].childNodes[j].nodeType === 3) {
+            wnTextNodes.push(waLinks[i].childNodes[j]);
+          }
+        }
+        for (var j = wnTextNodes.length - 1; j >= 0; j--) {
+          if (/\d/.test(wnTextNodes[j].textContent)) {
+            wnTextNodes[j].textContent = c.whatsapp;
+            break;
+          }
+        }
       }
     }
 
