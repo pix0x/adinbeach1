@@ -1,9 +1,9 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rezervasyon â€” Adin Beach Hotel</title>
+<title>Rezervasyon — Adin Beach Hotel</title>
 <meta name="theme-color" content="#bb9b6a">
 <link rel="icon" type="image/png" href="../assets/images/brand/logo.png">
 <link rel="stylesheet" href="../assets/css/google-fonts.css">
@@ -161,7 +161,7 @@ select.field option{background:#1a1a18;color:var(--body)}
 .btn-calc:hover{background:var(--gold);color:var(--ink)}
 .btn-calc:disabled{opacity:.5;cursor:not-allowed}
 .btn-calc.loading{pointer-events:none;opacity:.6}
-/* --- Ã–DEME YÃ–NTEMÄ° --- */
+/* --- ÖDEME YÖNTEMİ --- */
 .payment-options{display:flex;gap:.75rem;margin-bottom:1rem}
 @media(max-width:480px){.payment-options{flex-direction:column}}
 .payment-option{
@@ -184,7 +184,7 @@ select.field option{background:#1a1a18;color:var(--body)}
 .payment-option .option-desc{
   display:block;font-size:.7rem;color:var(--body-muted);
 }
-/* --- IBAN / Ä°LETÄ°ÅÄ°M BÄ°LGÄ°LERÄ° --- */
+/* --- IBAN / İLETİŞİM BİLGİLERİ --- */
 .info-box{
   background:#22211e;border:1px solid rgba(255,255,255,.06);
   border-radius:.75rem;padding:1rem 1.25rem;margin-bottom:1rem;
@@ -274,10 +274,10 @@ select.field option{background:#1a1a18;color:var(--body)}
     <a href="../odalar/">Odalar</a>
     <a href="../lezzet/">Lezzet</a>
     <a href="../deniz-ve-havuz/">Deniz &amp; Havuz</a>
-    <a href="../eglence/">EÄŸlence</a>
-    <a href="../toplanti/">ToplantÄ±</a>
-    <a href="../hakkimizda/">HakkÄ±mÄ±zda</a>
-    <a href="../bize-ulasin/">Ä°letiÅŸim</a>
+    <a href="../eglence/">Eğlence</a>
+    <a href="../toplanti/">Toplantı</a>
+    <a href="../hakkimizda/">Hakkımızda</a>
+    <a href="../bize-ulasin/">İletişim</a>
     <a href="../rezervasyon/" class="nav-cta">Rezervasyon</a>
   </nav>
 </header>
@@ -287,7 +287,7 @@ select.field option{background:#1a1a18;color:var(--body)}
   <div class="hero-bg"></div>
   <div class="hero-content">
     <h1>Rezervasyon Talebi</h1>
-    <p>Size Ã¶zel teklifimizi hazÄ±rlamamÄ±z iÃ§in bilgilerinizi doldurun</p>
+    <p>Size özel teklifimizi hazırlamamız için bilgilerinizi doldurun</p>
     <div class="gold-line"></div>
   </div>
 </section>
@@ -299,22 +299,22 @@ select.field option{background:#1a1a18;color:var(--body)}
     <!-- notification area (doldurulur JS ile) -->
     <div id="notification"></div>
 
-    <!-- SUCCESS (gizli, JS gÃ¶sterir) -->
+    <!-- SUCCESS (gizli, JS gösterir) -->
     <div id="successPage" class="success-page" style="display:none">
-      <div class="icon">âœ…</div>
-      <h2>TeÅŸekkÃ¼r Ederiz!</h2>
-      <p id="successMessage">Rezervasyon talebiniz baÅŸarÄ±yla alÄ±ndÄ±! En kÄ±sa sÃ¼rede sizinle iletiÅŸime geÃ§eceÄŸiz.</p>
-      <a href="../index.html" class="btn-back">â† Ana Sayfaya DÃ¶n</a>
+      <div class="icon">?</div>
+      <h2>Teşekkür Ederiz!</h2>
+      <p id="successMessage">Rezervasyon talebiniz başarıyla alındı! En kısa sürede sizinle iletişime geçeceğiz.</p>
+      <a href="../index.html" class="btn-back">‹ Ana Sayfaya Dön</a>
     </div>
 
     <!-- FORM -->
     <div id="formWrapper">
       <h2>Rezervasyon Bilgileri</h2>
-      <p class="form-subtitle">TÃ¼m alanlarÄ± eksiksiz doldurunuz</p>
+      <p class="form-subtitle">Tüm alanları eksiksiz doldurunuz</p>
 
       <form id="reservationForm" novalidate>
 
-        <!-- TARÄ°HLER -->
+        <!-- TARİHLER -->
         <div class="field-group">
           <div class="field-label" style="margin-bottom:.75rem">
             <span style="display:inline-flex;align-items:center;gap:.5rem">
@@ -324,17 +324,17 @@ select.field option{background:#1a1a18;color:var(--body)}
           </div>
           <div class="field-row">
             <div>
-              <label class="field-label" for="giris">GiriÅŸ Tarihi *</label>
+              <label class="field-label" for="giris">Giriş Tarihi *</label>
               <input type="date" id="giris" name="giris" class="field" required>
             </div>
             <div>
-              <label class="field-label" for="cikis">Ã‡Ä±kÄ±ÅŸ Tarihi *</label>
+              <label class="field-label" for="cikis">Çıkış Tarihi *</label>
               <input type="date" id="cikis" name="cikis" class="field" required>
             </div>
           </div>
         </div>
 
-        <!-- ODA TÄ°PÄ° -->
+        <!-- ODA TİPİ -->
         <div class="field-group">
           <div class="field-label" style="margin-bottom:.75rem">
             <span style="display:inline-flex;align-items:center;gap:.5rem">
@@ -344,31 +344,31 @@ select.field option{background:#1a1a18;color:var(--body)}
           </div>
           <label class="field-label" for="oda_tipi">Oda Tipi *</label>
           <select id="oda_tipi" name="oda_tipi" class="field" required>
-            <option value="">LÃ¼tfen bir oda tipi seÃ§in</option>
+            <option value="">Lütfen bir oda tipi seçin</option>
             <optgroup label="Premium Odalar">
-              <option value="Deniz ManzaralÄ± Premium Dubleks Royal Oda">Deniz ManzaralÄ± Premium Dubleks Royal Oda</option>
-              <option value="Deniz ManzaralÄ± Premium Dubleks Superior Oda">Deniz ManzaralÄ± Premium Dubleks Superior Oda</option>
-              <option value="Deniz ManzaralÄ± Premium Suit Oda">Deniz ManzaralÄ± Premium Suit Oda</option>
-              <option value="Deniz ManzaralÄ± Premium Aile Oda">Deniz ManzaralÄ± Premium Aile Oda</option>
-              <option value="Deniz ManzaralÄ± Premium Connection Oda">Deniz ManzaralÄ± Premium Connection Oda</option>
-              <option value="Deniz ManzaralÄ± Premium Standart Oda">Deniz ManzaralÄ± Premium Standart Oda</option>
-              <option value="Deniz ManzaralÄ± Premium Engelli Oda">Deniz ManzaralÄ± Premium Engelli Oda</option>
+              <option value="Deniz Manzaralı Premium Dubleks Royal Oda">Deniz Manzaralı Premium Dubleks Royal Oda</option>
+              <option value="Deniz Manzaralı Premium Dubleks Superior Oda">Deniz Manzaralı Premium Dubleks Superior Oda</option>
+              <option value="Deniz Manzaralı Premium Suit Oda">Deniz Manzaralı Premium Suit Oda</option>
+              <option value="Deniz Manzaralı Premium Aile Oda">Deniz Manzaralı Premium Aile Oda</option>
+              <option value="Deniz Manzaralı Premium Connection Oda">Deniz Manzaralı Premium Connection Oda</option>
+              <option value="Deniz Manzaralı Premium Standart Oda">Deniz Manzaralı Premium Standart Oda</option>
+              <option value="Deniz Manzaralı Premium Engelli Oda">Deniz Manzaralı Premium Engelli Oda</option>
             </optgroup>
             <optgroup label="Flora Odalar">
-              <option value="BahÃ§e ManzaralÄ± Flora Oda">BahÃ§e ManzaralÄ± Flora Oda</option>
-              <option value="BahÃ§e ManzaralÄ± Flora Connection Oda">BahÃ§e ManzaralÄ± Flora Connection Oda</option>
-              <option value="BahÃ§e ManzaralÄ± Flora Dublex Oda">BahÃ§e ManzaralÄ± Flora Dublex Oda</option>
-              <option value="BahÃ§e & Deniz ManzaralÄ± Flora Mercan">BahÃ§e &amp; Deniz ManzaralÄ± Flora Mercan</option>
-              <option value="BahÃ§e ManzaralÄ± Flora Yasemin">BahÃ§e ManzaralÄ± Flora Yasemin</option>
+              <option value="Bahçe Manzaralı Flora Oda">Bahçe Manzaralı Flora Oda</option>
+              <option value="Bahçe Manzaralı Flora Connection Oda">Bahçe Manzaralı Flora Connection Oda</option>
+              <option value="Bahçe Manzaralı Flora Dublex Oda">Bahçe Manzaralı Flora Dublex Oda</option>
+              <option value="Bahçe & Deniz Manzaralı Flora Mercan">Bahçe &amp; Deniz Manzaralı Flora Mercan</option>
+              <option value="Bahçe Manzaralı Flora Yasemin">Bahçe Manzaralı Flora Yasemin</option>
             </optgroup>
-            <optgroup label="Size Ã–zel Villa">
+            <optgroup label="Size Özel Villa">
               <option value="Villa Gloria">Villa Gloria</option>
               <option value="Villa Magnolia">Villa Magnolia</option>
             </optgroup>
           </select>
         </div>
 
-        <!-- MÄ°SAFÄ°RLER -->
+        <!-- MİSAFİRLER -->
         <div class="field-group">
           <div class="field-label" style="margin-bottom:.75rem">
             <span style="display:inline-flex;align-items:center;gap:.5rem">
@@ -378,40 +378,40 @@ select.field option{background:#1a1a18;color:var(--body)}
           </div>
 
           <div class="stepper" data-min="1" data-max="5" data-target="yetiskin" id="stepperYetiskin">
-            <span class="stepper-label">YetiÅŸkin <span>(1â€“5)</span></span>
+            <span class="stepper-label">Yetişkin <span>(1–5)</span></span>
             <div class="stepper-controls">
-              <button type="button" class="stepper-btn" aria-label="Azalt">âˆ’</button>
+              <button type="button" class="stepper-btn" aria-label="Azalt">-</button>
               <span class="stepper-value">2</span>
-              <button type="button" class="stepper-btn" aria-label="ArttÄ±r">+</button>
+              <button type="button" class="stepper-btn" aria-label="Arttır">+</button>
             </div>
           </div>
           <input type="hidden" name="yetiskin_sayisi" value="2" id="h_yetiskin_sayisi">
           <div class="guest-inputs" id="guest_yetiskin">
-            <input type="text" name="yetiskin_1" class="field" placeholder="1. YetiÅŸkin Ad Soyad" maxlength="24">
-            <input type="text" name="yetiskin_2" class="field" placeholder="2. YetiÅŸkin Ad Soyad" maxlength="24">
-            <input type="text" name="yetiskin_3" class="field" placeholder="3. YetiÅŸkin Ad Soyad" maxlength="24" style="display:none">
-            <input type="text" name="yetiskin_4" class="field" placeholder="4. YetiÅŸkin Ad Soyad" maxlength="24" style="display:none">
-            <input type="text" name="yetiskin_5" class="field" placeholder="5. YetiÅŸkin Ad Soyad" maxlength="24" style="display:none">
+            <input type="text" name="yetiskin_1" class="field" placeholder="1. Yetişkin Ad Soyad" maxlength="24">
+            <input type="text" name="yetiskin_2" class="field" placeholder="2. Yetişkin Ad Soyad" maxlength="24">
+            <input type="text" name="yetiskin_3" class="field" placeholder="3. Yetişkin Ad Soyad" maxlength="24" style="display:none">
+            <input type="text" name="yetiskin_4" class="field" placeholder="4. Yetişkin Ad Soyad" maxlength="24" style="display:none">
+            <input type="text" name="yetiskin_5" class="field" placeholder="5. Yetişkin Ad Soyad" maxlength="24" style="display:none">
           </div>
 
           <div class="stepper" data-min="0" data-max="5" data-target="" id="stepperCocuk">
-            <span class="stepper-label">Ã‡ocuk <span>(0â€“5)</span></span>
+            <span class="stepper-label">Çocuk <span>(0–5)</span></span>
             <div class="stepper-controls">
-              <button type="button" class="stepper-btn" disabled aria-label="Azalt">âˆ’</button>
+              <button type="button" class="stepper-btn" disabled aria-label="Azalt">-</button>
               <span class="stepper-value">0</span>
-              <button type="button" class="stepper-btn" aria-label="ArttÄ±r">+</button>
+              <button type="button" class="stepper-btn" aria-label="Arttır">+</button>
             </div>
           </div>
           <input type="hidden" name="cocuk_sayisi" value="0" id="h_cocuk_sayisi">
-          <p style="font-size:.75rem;color:var(--body-muted);margin-top:.25rem">Ã‡ocuk yaÅŸlarÄ±, doÄŸru fiyatlandÄ±rma iÃ§in doÄŸum tarihinden hesaplanÄ±r.</p>
+          <p style="font-size:.75rem;color:var(--body-muted);margin-top:.25rem">Çocuk yaşları, doğru fiyatlandırma için doğum tarihinden hesaplanır.</p>
         </div>
 
-        <!-- Ä°LETÄ°ÅÄ°M -->
+        <!-- İLETİŞİM -->
         <div class="field-group">
           <div class="field-label" style="margin-bottom:.75rem">
             <span style="display:inline-flex;align-items:center;gap:.5rem">
               <span style="display:inline-block;width:1.5rem;height:1px;background:var(--gold-dim)"></span>
-              Ä°letiÅŸim Bilgileri
+              İletişim Bilgileri
             </span>
           </div>
           <div class="field-row">
@@ -424,10 +424,10 @@ select.field option{background:#1a1a18;color:var(--body)}
               <input type="tel" id="telefon" name="telefon" class="field" placeholder="+90 5xx xxx xx xx">
             </div>
           </div>
-          <p style="font-size:.75rem;color:var(--body-muted);margin-top:.25rem">E-posta veya telefon alanÄ±ndan en az birini doldurunuz.</p>
+          <p style="font-size:.75rem;color:var(--body-muted);margin-top:.25rem">E-posta veya telefon alanından en az birini doldurunuz.</p>
         </div>
 
-        <!-- FÄ°YAT HESAPLAMA -->
+        <!-- FİYAT HESAPLAMA -->
         <div class="field-group">
           <div class="field-label" style="margin-bottom:.75rem">
             <span style="display:inline-flex;align-items:center;gap:.5rem">
@@ -437,7 +437,7 @@ select.field option{background:#1a1a18;color:var(--body)}
           </div>
           <button type="button" class="btn-calc" id="calcPriceBtn">Fiyat Hesapla</button>
           <div class="pricing-box" id="pricingBox">
-            <div class="pricing-loading" id="pricingLoading">HesaplanÄ±yor...</div>
+            <div class="pricing-loading" id="pricingLoading">Hesaplanıyor...</div>
             <div id="pricingResult" style="display:none">
               <div id="pricingRows"></div>
               <div class="pricing-total">
@@ -445,74 +445,78 @@ select.field option{background:#1a1a18;color:var(--body)}
                 <span class="value" id="pricingTotal"></span>
               </div>
               <div style="margin-top:.75rem;font-size:.75rem;color:var(--body-muted);text-align:center">
-                Fiyatlara KDV dahildir. Kesin fiyat bilgisi rezervasyon onayÄ±nda netleÅŸir.
+                Fiyatlara KDV dahildir. Kesin fiyat bilgisi rezervasyon onayında netleşir.
               </div>
             </div>
             <div class="pricing-error" id="pricingError" style="display:none"></div>
           </div>
         </div>
 
-        <!-- Ã–DEME YÃ–NTEMÄ° -->
+        <!-- ÖDEME YÖNTEMİ -->
         <div class="field-group">
           <div class="field-label" style="margin-bottom:.75rem">
             <span style="display:inline-flex;align-items:center;gap:.5rem">
               <span style="display:inline-block;width:1.5rem;height:1px;background:var(--gold-dim)"></span>
-              Ã–deme YÃ¶ntemi
+              Ödeme Yöntemi
             </span>
           </div>
           <div class="payment-options" id="paymentOptions">
             <label class="payment-option selected" id="optCredit">
               <input type="radio" name="odeme_yontemi" value="credit" checked>
-              <span class="option-label">Kredi KartÄ±</span>
-              <span class="option-desc">Tek Ã§ekim veya taksitli Ã¶deme</span>
+              <span class="option-label">Kredi Kartı</span>
+              <span class="option-desc">Tek çekim veya taksitli ödeme</span>
             </label>
             <label class="payment-option" id="optHavale">
               <input type="radio" name="odeme_yontemi" value="havale">
               <span class="option-label">Havale / EFT</span>
-              <span class="option-desc">%15 indirim avantajÄ±</span>
+              <span class="option-desc">%15 indirim avantajı</span>
             </label>
           </div>
           <input type="hidden" name="toplam_tutar" id="h_toplam_tutar" value="0">
         </div>
 
-        <!-- IBAN VE Ä°LETÄ°ÅÄ°M BÄ°LGÄ°LERÄ° (config'den doldurulur) -->
+        <!-- IBAN VE İLETİŞİM BİLGİLERİ (config'den doldurulur) -->
         <div class="info-box" id="ibanBox">
           <div class="info-row">
-            <span class="info-icon">ğŸ¦</span>
+            <span class="info-icon">??</span>
             <div>
               <span class="info-label">IBAN:</span>
               <span class="info-value" id="ibanValue"></span>
               <button type="button" class="info-copy-btn" id="ibanCopyBtn">Kopyala</button>
             </div>
           </div>
+          <div class="info-row" id="ibanNameRow" style="display:none">
+            <span class="info-icon">??</span>
+            <div><span class="info-label">Alıcı:</span> <span class="info-value" id="ibanNameValue"></span></div>
+          </div>
         </div>
         <div class="info-box visible" id="contactBox">
           <div class="info-row">
-            <span class="info-icon">ğŸ“</span>
+            <span class="info-icon">??</span>
             <div><span class="info-label">Telefon:</span> <span class="info-value" id="phoneValue"></span></div>
           </div>
           <div class="info-row">
-            <span class="info-icon">ğŸ“±</span>
+            <span class="info-icon">??</span>
             <div><span class="info-label">WhatsApp:</span> <span class="info-value" id="whatsappValue"></span></div>
           </div>
         </div>
 
         <!-- NOT -->
         <div class="field-group">
-          <label class="field-label" for="not">Ã–zel Ä°stek / Not</label>
-          <textarea id="not" name="not" rows="4" maxlength="600" class="field" placeholder="Bizimle paylaÅŸmak istediÄŸiniz Ã¶zel istekleriniz..."></textarea>
+          <label class="field-label" for="not">Özel İstek / Not</label>
+          <textarea id="not" name="not" rows="4" maxlength="600" class="field" placeholder="Bizimle paylaşmak istediğiniz özel istekleriniz..."></textarea>
         </div>
 
         <!-- SUBMIT -->
         <button type="submit" class="btn-primary" id="submitBtn">
-          Rezervasyon Talebi GÃ¶nder
+          Rezervasyon Talebi Gönder
           <span class="spinner"></span>
         </button>
 
         <p style="text-align:center;font-size:.75rem;color:var(--body-muted);margin-top:.75rem">
-          Talebinizi gÃ¶ndererek
-          <a href="../hakkimizda/index.html" style="color:var(--gold);text-decoration:underline;text-underline-offset:2px">KVKK AydÄ±nlatma Metni</a>'ni
-          okuduÄŸunuzu kabul edersiniz.
+          Talebinizi göndererek
+          <a href="../hakkimizda/index.html" style="color:var(--gold);text-decoration:underline;text-underline-offset:2px">KVKK Aydınlatma Metni</a>'ni
+          okuduğunuzu kabul edersiniz.
         </p>
 
       </form>
@@ -523,11 +527,11 @@ select.field option{background:#1a1a18;color:var(--body)}
 
 <!-- FOOTER -->
 <footer class="site-footer">
-  Adin Beach Hotel &copy; <span id="year"></span> &mdash; TÃ¼m haklarÄ± saklÄ±dÄ±r.
+  Adin Beach Hotel &copy; <span id="year"></span> &mdash; Tüm hakları saklıdır.
 </footer>
 
 <script>
-// --- YÄ±l ---
+// --- Yıl ---
 document.getElementById('year').textContent = new Date().getFullYear();
 
 // --- Tarih kontrolleri ---
@@ -581,7 +585,7 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
   btnMinus.addEventListener('click', function() { update(parseInt(display.textContent) - 1); });
 });
 
-// --- Config yÃ¼kle (IBAN, telefon, WhatsApp) ---
+// --- Config yükle (IBAN, telefon, WhatsApp) ---
 (function() {
   fetch('/api/config').then(function(r) { return r.json(); }).then(function(cfg) {
     if (cfg.success && cfg.config) {
@@ -590,13 +594,17 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
         document.getElementById('ibanValue').textContent = c.iban;
         document.getElementById('ibanBox').classList.add('visible');
       }
+      if (c.name) {
+        document.getElementById('ibanNameValue').textContent = c.name;
+        document.getElementById('ibanNameRow').style.display = '';
+      }
       if (c.phone)  document.getElementById('phoneValue').textContent = c.phone;
       if (c.whatsapp) document.getElementById('whatsappValue').textContent = c.whatsapp;
     }
   }).catch(function() {});
 })();
 
-// --- Ã–deme yÃ¶ntemi seÃ§imi ---
+// --- Ödeme yöntemi seçimi ---
 (function() {
   var radios = document.querySelectorAll('input[name="odeme_yontemi"]');
   var ibanBox = document.getElementById('ibanBox');
@@ -606,7 +614,7 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
         opt.classList.remove('selected');
       });
       this.closest('.payment-option').classList.add('selected');
-      // Havale seÃ§iliyse IBAN'Ä± gÃ¶ster
+      // Havale seçiliyse IBAN'ı göster
       if (this.value === 'havale' || this.value === 'transfer') {
         ibanBox.classList.add('visible');
       } else {
@@ -622,7 +630,7 @@ document.getElementById('ibanCopyBtn').addEventListener('click', function() {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(iban).then(function() {
       var btn = document.getElementById('ibanCopyBtn');
-      btn.textContent = 'KopyalandÄ±!';
+      btn.textContent = 'Kopyalandı!';
       setTimeout(function() { btn.textContent = 'Kopyala'; }, 2000);
     }).catch(function() {});
   } else {
@@ -635,7 +643,7 @@ document.getElementById('ibanCopyBtn').addEventListener('click', function() {
     try { document.execCommand('copy'); } catch(e) {}
     document.body.removeChild(ta);
     var btn = document.getElementById('ibanCopyBtn');
-    btn.textContent = 'KopyalandÄ±!';
+    btn.textContent = 'Kopyalandı!';
     setTimeout(function() { btn.textContent = 'Kopyala'; }, 2000);
   }
 });
@@ -658,19 +666,19 @@ document.getElementById('calcPriceBtn').addEventListener('click', async function
   var rowsDiv = document.getElementById('pricingRows');
   var totalSpan = document.getElementById('pricingTotal');
 
-  // Hata/Ã¶nceki sonucu temizle
+  // Hata/önceki sonucu temizle
   errorDiv.style.display = 'none';
   resultDiv.style.display = 'none';
   loadingDiv.style.display = 'block';
   box.classList.add('visible');
   btn.disabled = true;
   btn.classList.add('loading');
-  btn.textContent = 'HesaplanÄ±yor...';
+  btn.textContent = 'Hesaplanıyor...';
 
   var errors = [];
-  if (!giris) errors.push('GiriÅŸ tarihi seÃ§in.');
-  if (!cikis) errors.push('Ã‡Ä±kÄ±ÅŸ tarihi seÃ§in.');
-  if (!odaTipi) errors.push('Oda tipi seÃ§in.');
+  if (!giris) errors.push('Giriş tarihi seçin.');
+  if (!cikis) errors.push('Çıkış tarihi seçin.');
+  if (!odaTipi) errors.push('Oda tipi seçin.');
 
   if (errors.length) {
     loadingDiv.style.display = 'none';
@@ -699,38 +707,38 @@ document.getElementById('calcPriceBtn').addEventListener('click', async function
     var data = await res.json();
 
     if (!data.success) {
-      throw new Error(data.error || 'Fiyat hesaplanamadÄ±.');
+      throw new Error(data.error || 'Fiyat hesaplanamadı.');
     }
 
     loadingDiv.style.display = 'none';
 
-    // Fiyat satÄ±rlarÄ±nÄ± oluÅŸtur
+    // Fiyat satırlarını oluştur
     var html = '';
     var p = data.pricing;
 
-    // Gecelik baz fiyat (Ã¶zet)
+    // Gecelik baz fiyat (özet)
     html += '<div class="pricing-row">';
     html += '<span class="pricing-label">Gecelik Baz Fiyat (' + data.dates.nights + ' gece)</span>';
     html += '<span class="pricing-value">' + p.subtotal.toLocaleString('tr-TR') + ' TL</span>';
     html += '</div>';
 
-    // Ek yetiÅŸkin
+    // Ek yetişkin
     if (p.extraAdultCount > 0) {
       html += '<div class="pricing-row">';
-      html += '<span class="pricing-label">Ek YetiÅŸkin (' + p.extraAdultCount + ' kiÅŸi x ' + p.extraAdultFee.toLocaleString('tr-TR') + ' TL x ' + data.dates.nights + ' gece)</span>';
+      html += '<span class="pricing-label">Ek Yetişkin (' + p.extraAdultCount + ' kişi x ' + p.extraAdultFee.toLocaleString('tr-TR') + ' TL x ' + data.dates.nights + ' gece)</span>';
       html += '<span class="pricing-value">+' + p.extraAdultTotal.toLocaleString('tr-TR') + ' TL</span>';
       html += '</div>';
     }
 
-    // Ã‡ocuk
+    // Çocuk
     if (data.guests.children > 0 && p.childTotal > 0) {
       html += '<div class="pricing-row">';
-      html += '<span class="pricing-label">Ã‡ocuk Ãœcreti (' + data.guests.children + ' Ã§ocuk)</span>';
+      html += '<span class="pricing-label">Çocuk Ücreti (' + data.guests.children + ' çocuk)</span>';
       html += '<span class="pricing-value">+' + p.childTotal.toLocaleString('tr-TR') + ' TL</span>';
       html += '</div>';
     }
 
-    // Ä°ndirimler
+    // İndirimler
     if (p.discounts.length > 0) {
       html += '<div class="pricing-row">';
       html += '<span class="pricing-label pricing-discount">' + p.discounts.join(', ') + '</span>';
@@ -742,17 +750,17 @@ document.getElementById('calcPriceBtn').addEventListener('click', async function
     totalSpan.textContent = p.total.toLocaleString('tr-TR') + ' TL';
     resultDiv.style.display = 'block';
     document.getElementById('h_toplam_tutar').value = p.total;
-    // Havale seÃ§ili ve indirim varsa belirt
+    // Havale seçili ve indirim varsa belirt
     if (data.pricing.discounts.some(function(d) { return d.indexOf('Havale') > -1; })) {
       var note = document.createElement('div');
       note.style.cssText = 'margin-top:.5rem;padding:.5rem;background:rgba(134,239,172,.1);border:1px solid rgba(134,239,172,.2);border-radius:.4rem;font-size:.75rem;color:#86efac;text-align:center';
-      note.textContent = 'âœ… Havale indirimi (%15) fiyata yansÄ±tÄ±lmÄ±ÅŸtÄ±r.';
+      note.textContent = '? Havale indirimi (%15) fiyata yansıtılmıştır.';
       document.getElementById('pricingRows').appendChild(note);
     }
 
   } catch (err) {
     loadingDiv.style.display = 'none';
-    errorDiv.textContent = err.message || 'Fiyat hesaplanÄ±rken bir hata oluÅŸtu.';
+    errorDiv.textContent = err.message || 'Fiyat hesaplanırken bir hata oluştu.';
     errorDiv.style.display = 'block';
   } finally {
     btn.disabled = false;
@@ -770,11 +778,11 @@ document.getElementById('reservationForm').addEventListener('submit', async func
   var notif = document.getElementById('notification');
   var formWrapper = document.getElementById('formWrapper');
 
-  // Ã–nceki bildirimi temizle
+  // Önceki bildirimi temizle
   notif.innerHTML = '';
   notif.style.display = 'none';
 
-  // Client-side doÄŸrulama
+  // Client-side doğrulama
   var giris = form.giris.value.trim();
   var cikis = form.cikis.value.trim();
   var odaTipi = form.oda_tipi.value;
@@ -782,10 +790,10 @@ document.getElementById('reservationForm').addEventListener('submit', async func
   var telefon = form.telefon.value.trim();
 
   var errors = [];
-  if (!giris) errors.push('GiriÅŸ tarihi zorunludur.');
-  if (!cikis) errors.push('Ã‡Ä±kÄ±ÅŸ tarihi zorunludur.');
-  if (!odaTipi) errors.push('Oda tipi seÃ§iniz.');
-  if (!email && !telefon) errors.push('E-posta veya telefon alanÄ±ndan en az birini doldurun.');
+  if (!giris) errors.push('Giriş tarihi zorunludur.');
+  if (!cikis) errors.push('Çıkış tarihi zorunludur.');
+  if (!odaTipi) errors.push('Oda tipi seçiniz.');
+  if (!email && !telefon) errors.push('E-posta veya telefon alanından en az birini doldurun.');
 
   if (errors.length) {
     notif.innerHTML = '<div class="notification error">' + errors.join('<br>') + '</div>';
@@ -794,7 +802,7 @@ document.getElementById('reservationForm').addEventListener('submit', async func
     return;
   }
 
-  // JSON body oluÅŸtur
+  // JSON body oluştur
   var formData = new FormData(form);
   var data = {};
   for (var pair of formData.entries()) {
@@ -804,7 +812,7 @@ document.getElementById('reservationForm').addEventListener('submit', async func
   // Loading state
   btn.disabled = true;
   btn.classList.add('loading');
-  btn.innerHTML = 'GÃ¶nderiliyor... <span class="spinner"></span>';
+  btn.innerHTML = 'Gönderiliyor... <span class="spinner"></span>';
   formWrapper.classList.add('form-loading');
 
   try {
@@ -817,28 +825,28 @@ document.getElementById('reservationForm').addEventListener('submit', async func
     var result = await res.json();
 
     if (result.success) {
-      // BaÅŸarÄ±lÄ± â†’ success sayfasÄ±nÄ± gÃ¶ster
+      // Başarılı › success sayfasını göster
       formWrapper.style.display = 'none';
       document.getElementById('successMessage').innerHTML = result.message.replace(/\n/g, '<br>');
       document.getElementById('successPage').style.display = 'block';
       document.getElementById('successPage').scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
-      // Hata â†’ notification gÃ¶ster
-      notif.innerHTML = '<div class="notification error">' + (result.error || 'Bir hata oluÅŸtu.') + '</div>';
+      // Hata › notification göster
+      notif.innerHTML = '<div class="notification error">' + (result.error || 'Bir hata oluştu.') + '</div>';
       notif.style.display = 'block';
       notif.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   } catch (err) {
-    notif.innerHTML = '<div class="notification error">Bir hata oluÅŸtu, lÃ¼tfen daha sonra tekrar deneyiniz.</div>';
+    notif.innerHTML = '<div class="notification error">Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.</div>';
     notif.style.display = 'block';
     notif.scrollIntoView({ behavior: 'smooth', block: 'center' });
   } finally {
     btn.disabled = false;
     btn.classList.remove('loading');
-    btn.innerHTML = 'Rezervasyon Talebi GÃ¶nder<span class="spinner"></span>';
+    btn.innerHTML = 'Rezervasyon Talebi Gönder<span class="spinner"></span>';
     formWrapper.classList.remove('form-loading');
   }
 });
 </script>
-</body>
+<script src="../assets/js/config-loader.js"></script></body>
 </html>
