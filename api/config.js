@@ -1,56 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const { put, get } = require('@vercel/blob');
 
 const CONFIG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const TMP_PATH = '/tmp/config.json';
-
-// Blob REST API (Vercel Blob - tum instance'lar arasi kalici depolama)
-const BLOB_STORE_ID = process.env.BLOB_STORE_ID;
-const BLOB_API = process.env.VERCEL_BLOB_API_URL || 'https://vercel.com/api/blob';
-
-function getOidcToken(req) {
-  var h = req ? req.headers['x-vercel-oidc-token'] : undefined;
-  return h || process.env.VERCEL_OIDC_TOKEN;
-}
-
-async function blobGet(req) {
-  if (!BLOB_STORE_ID) return null;
-  var token = getOidcToken(req);
-  if (!token) return null;
-  try {
-    var res = await fetch(BLOB_API + '/?pathname=config.json', {
-      headers: {
-        authorization: 'Bearer ' + token,
-        'x-vercel-blob-store-id': BLOB_STORE_ID,
-      },
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (_) { return null; }
-}
-
-async function blobPut(data, req) {
-  if (!BLOB_STORE_ID) return;
-  var token = getOidcToken(req);
-  if (!token) return;
-  try {
-    var json = JSON.stringify(data);
-    await fetch(BLOB_API + '/?pathname=config.json', {
-      method: 'PUT',
-      headers: {
-        authorization: 'Bearer ' + token,
-        'x-vercel-blob-store-id': BLOB_STORE_ID,
-        'x-api-blob-request-id': require('crypto').randomUUID(),
-        'x-api-blob-request-attempt': '0',
-        'x-api-version': '12',
-        'content-type': 'application/json',
-        'x-content-length': String(Buffer.byteLength(json)),
-        'x-add-random-suffix': '0',
-      },
-      body: json,
-    });
-  } catch (_) {}
-}
 
 function getDefaults() {
   return {
@@ -61,11 +14,11 @@ function getDefaults() {
   };
 }
 
-async function readConfig(req) {
+async function readConfig() {
   var cfg = getDefaults();
 
-  // 1. Blob store (kalici)
-  var bd = await blobGet(req);
+  // 1. Blob store (kalici - tum instance'lar arasi)
+  var bd = await blobGet();
   if (bd) {
     for (var k of ['iban', 'name', 'phone', 'whatsapp']) { if (bd[k]) cfg[k] = bd[k]; }
   }
@@ -87,9 +40,9 @@ async function readConfig(req) {
   return cfg;
 }
 
-async function writeConfig(config, req) {
-  // 1. Blob (kalici)
-  await blobPut(config, req);
+async function writeConfig(config) {
+  // 1. Blob (kalici - tum instance'lar arasi)
+  await blobPut(config);
 
   // 2. /tmp (cache)
   try {
@@ -108,6 +61,33 @@ async function writeConfig(config, req) {
   } catch (_) {}
 }
 
+async function blobGet() {
+  try {
+    var blob = await get('config.json', { access: 'public' });
+    if (!blob || !blob.stream) return null;
+    var reader = blob.stream.getReader();
+    var decoder = new TextDecoder();
+    var chunks = [];
+    while (true) {
+      var { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(decoder.decode(value, { stream: true }));
+    }
+    chunks.push(decoder.decode());
+    return JSON.parse(chunks.join(''));
+  } catch (_) { return null; }
+}
+
+async function blobPut(data) {
+  try {
+    await put('config.json', JSON.stringify(data), {
+      access: 'public',
+      addRandomSuffix: false,
+      contentType: 'application/json',
+    });
+  } catch (_) {}
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -116,7 +96,7 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (req.method === 'GET') {
-    var cfg = await readConfig(req);
+    var cfg = await readConfig();
     var key = (req.url.split('?')[1] || '').replace('key=', '');
     if (key === 'all') return res.status(200).json({ success: true, config: cfg });
     if (key && cfg[key] !== undefined) return res.status(200).json({ success: true, key: key, value: cfg[key] });
@@ -131,7 +111,7 @@ module.exports = async (req, res) => {
     var expectedToken = process.env.TELEGRAM_CONFIG_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
     if (body.token !== expectedToken) return res.status(401).json({ success: false, error: 'Yetkisiz erisim.' });
 
-    var cfg = await readConfig(req);
+    var cfg = await readConfig();
     var allowedKeys = ['iban', 'name', 'phone', 'whatsapp'];
     var changed = [];
 
@@ -144,7 +124,7 @@ module.exports = async (req, res) => {
 
     if (changed.length === 0) return res.status(400).json({ success: false, error: 'Guncellenecek deger bulunamadi.' });
 
-    await writeConfig(cfg, req);
+    await writeConfig(cfg);
 
     return res.status(200).json({ success: true, updated: changed, message: 'Guncellendi: ' + changed.join(', ') });
   }

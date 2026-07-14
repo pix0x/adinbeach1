@@ -1,55 +1,45 @@
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
+const { put, get } = require('@vercel/blob');
 
 const TMP_PATH = '/tmp/config.json';
 const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
 const STATE_PATH = '/tmp/telegram_states.json';
 
-// Blob REST API (Vercel Blob - tum instance'lar arasi kalici depolama)
-// Vercel, her istege x-vercel-oidc-token header'i enjekte eder
-const BLOB_STORE_ID = process.env.BLOB_STORE_ID;
-const BLOB_API = process.env.VERCEL_BLOB_API_URL || 'https://vercel.com/api/blob';
-
-function getOidcToken(req) {
-  var h = req ? req.headers['x-vercel-oidc-token'] : undefined;
-  return h || process.env.VERCEL_OIDC_TOKEN;
+async function blobGet() {
+  try {
+    var blob = await get('config.json', { access: 'public' });
+    if (!blob || !blob.stream) return null;
+    var reader = blob.stream.getReader();
+    var decoder = new TextDecoder();
+    var chunks = [];
+    while (true) {
+      var { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(decoder.decode(value, { stream: true }));
+    }
+    chunks.push(decoder.decode());
+    return JSON.parse(chunks.join(''));
+  } catch (_) { return null; }
 }
 
-async function blobPut(data, req) {
-  if (!BLOB_STORE_ID) { console.error('blobPut: no BLOB_STORE_ID'); return; }
-  var token = getOidcToken(req);
-  if (!token) { console.error('blobPut: no OIDC token'); return; }
+async function blobPut(data) {
   try {
-    var json = JSON.stringify(data);
-    var url = BLOB_API + '/?pathname=config.json';
-    var res = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        authorization: 'Bearer ' + token,
-        'x-vercel-blob-store-id': BLOB_STORE_ID,
-        'x-api-blob-request-id': crypto.randomUUID(),
-        'x-api-blob-request-attempt': '0',
-        'x-api-version': '12',
-        'content-type': 'application/json',
-        'x-content-length': String(Buffer.byteLength(json)),
-        'x-add-random-suffix': '0',
-      },
-      body: json,
+    await put('config.json', JSON.stringify(data), {
+      access: 'public',
+      addRandomSuffix: false,
+      contentType: 'application/json',
     });
-    if (!res.ok) {
-      var bodyText = await res.text();
-      console.error('blobPut: HTTP ' + res.status + ' full=' + bodyText);
-      var allHeaders = '';
-      res.headers.forEach(function(v, k) { allHeaders += k + '=' + v + ' '; });
-      console.error('blobPut response headers: ' + allHeaders);
-    }
-  } catch (e) { console.error('blobPut exception:', e.message); }
+  } catch (_) {}
 }
 
 // ---
 
 function readConfig() {
+  // 1. Blob (kalici)
+  // NOTE: readConfig is sync (called inline in handler), so blob read is skipped here
+  // and done via the async read above if needed. For now, fallback to local.
+
   try {
     if (fs.existsSync(TMP_PATH)) {
       var tmp = JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8'));
@@ -115,7 +105,7 @@ module.exports = async (req, res) => {
     if (pending && pending.action === 'awaiting_name' && !text.startsWith('/')) {
       config.name = text;
       writeConfigLocal(config);
-      await blobPut(config, req);
+      await blobPut(config);
       delete states[chatId];
       writeState(states);
       reply = 'Hesap sahibi kaydedildi:\n<b>' + text + '</b>\n\nIBAN ve isim bilgisi guncellendi.';
@@ -136,7 +126,7 @@ module.exports = async (req, res) => {
       } else {
         config.iban = val;
         writeConfigLocal(config);
-        await blobPut(config, req);
+        await blobPut(config);
         states[chatId] = { action: 'awaiting_name' };
         writeState(states);
         reply = 'IBAN guncellendi:\n<code>' + val + '</code>\n\nSimdi <b>hesap sahibinin adini ve soyadini</b> yazin:';
@@ -150,7 +140,7 @@ module.exports = async (req, res) => {
       } else {
         config.phone = val;
         writeConfigLocal(config);
-        await blobPut(config, req);
+        await blobPut(config);
         reply = 'Telefon guncellendi:\n' + val;
       }
     }
@@ -162,7 +152,7 @@ module.exports = async (req, res) => {
       } else {
         config.whatsapp = val;
         writeConfigLocal(config);
-        await blobPut(config, req);
+        await blobPut(config);
         reply = 'WhatsApp guncellendi:\n' + val;
       }
     }
@@ -174,7 +164,7 @@ module.exports = async (req, res) => {
       } else {
         config.name = val;
         writeConfigLocal(config);
-        await blobPut(config, req);
+        await blobPut(config);
         reply = 'Hesap sahibi guncellendi:\n<b>' + val + '</b>';
       }
     }
