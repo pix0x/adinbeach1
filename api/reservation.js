@@ -1,3 +1,14 @@
+const fs = require('fs');
+const path = require('path');
+
+function readConfig() {
+  const TMP_PATH = '/tmp/config.json';
+  const CFG_PATH = path.join(__dirname, '..', 'data', 'config.json');
+  try { if (fs.existsSync(TMP_PATH)) return JSON.parse(fs.readFileSync(TMP_PATH, 'utf-8')); } catch (_) {}
+  try { return JSON.parse(fs.readFileSync(CFG_PATH, 'utf-8')); } catch (_) {}
+  return { iban: '', phone: '', whatsapp: '' };
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -26,6 +37,8 @@ module.exports = async (req, res) => {
     const notlar  = (body.not     || '').trim();
     const yetiskin = Array.isArray(body.yetiskin) ? body.yetiskin.filter(Boolean) : [];
     const cocuk   = Array.isArray(body.cocuk) ? body.cocuk.filter(Boolean) : [];
+    const odemeYontemi = (body.odeme_yontemi || 'credit').trim().toLowerCase();
+    const toplamTutar = parseFloat(body.toplam_tutar) || 0;
 
     // Validation
     const errors = [];
@@ -37,6 +50,9 @@ module.exports = async (req, res) => {
     if (errors.length) {
       return res.status(400).json({ message: errors.join('<br>') });
     }
+
+    const config = readConfig();
+    const isHavale = odemeYontemi === 'havale' || odemeYontemi === 'transfer';
 
     // Telegram bildirimi
     const token  = process.env.TELEGRAM_BOT_TOKEN || '';
@@ -53,7 +69,12 @@ module.exports = async (req, res) => {
       if (cocuk.length)    msg += `<b>🧒 Çocuklar:</b> ${cocuk.join(', ')}\n`;
       if (mail)    msg += `<b>📧 E-posta:</b> ${mail}\n`;
       if (telefon) msg += `<b>📞 Telefon:</b> ${telefon}\n`;
+      msg += `<b>💳 Ödeme:</b> ${isHavale ? 'Havale/EFT' : 'Kredi Kartı'}\n`;
+      if (toplamTutar > 0) msg += `<b>💰 Tutar:</b> ${toplamTutar.toLocaleString('tr-TR')} TL\n`;
+      if (isHavale && config.iban) msg += `\n<b>🏦 IBAN:</b> ${config.iban}\n`;
       if (notlar)  msg += `\n<b>📝 Not:</b>\n${notlar}\n`;
+      if (config.phone) msg += `\n<b>📞 Tel:</b> ${config.phone}`;
+      if (config.whatsapp) msg += `\n<b>📱 WhatsApp:</b> ${config.whatsapp}`;
       msg += `\n⏱ ${new Date().toLocaleString('tr-TR')}`;
 
       const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -66,7 +87,10 @@ module.exports = async (req, res) => {
     }
 
     if (telegramOk || !token) {
-      return res.status(200).json({ id: 'OK' });
+      return res.status(200).json({
+        id: 'OK',
+        iban: isHavale ? (config.iban || '') : undefined
+      });
     } else {
       return res.status(500).json({ message: 'Telegram bildirimi gönderilemedi.' });
     }
