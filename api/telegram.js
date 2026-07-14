@@ -38,8 +38,7 @@ async function blobPut(data, req) {
     });
     if (!res.ok) {
       var bodyText = (await res.text()) || '';
-      console.error('blobPut: status=' + res.status + ' body=' + bodyText.slice(0,200));
-      return; // don't block the response
+      console.error('blobPutErr=' + bodyText.slice(0,100));
     }
   } catch (e) { console.error('blobPut exception:', e.message); }
 }
