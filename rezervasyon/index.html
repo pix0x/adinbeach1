@@ -161,6 +161,47 @@ select.field option{background:#1a1a18;color:var(--body)}
 .btn-calc:hover{background:var(--gold);color:var(--ink)}
 .btn-calc:disabled{opacity:.5;cursor:not-allowed}
 .btn-calc.loading{pointer-events:none;opacity:.6}
+/* --- ÖDEME YÖNTEMİ --- */
+.payment-options{display:flex;gap:.75rem;margin-bottom:1rem}
+@media(max-width:480px){.payment-options{flex-direction:column}}
+.payment-option{
+  flex:1;position:relative;
+  background:#22211e;border:1px solid rgba(255,255,255,.08);
+  border-radius:.5rem;padding:.85rem 1rem .85rem 2.75rem;
+  cursor:pointer;transition:border-color .2s,background .2s;
+  user-select:none;
+}
+.payment-option:hover{border-color:rgba(187,155,106,.4)}
+.payment-option input[type=radio]{
+  position:absolute;left:.85rem;top:50%;margin-top:-.5rem;
+  width:1rem;height:1rem;accent-color:var(--gold);
+  cursor:pointer;
+}
+.payment-option.selected{background:rgba(187,155,106,.08);border-color:var(--gold)}
+.payment-option .option-label{
+  display:block;font-size:.8rem;font-weight:600;color:var(--body);margin-bottom:.15rem;
+}
+.payment-option .option-desc{
+  display:block;font-size:.7rem;color:var(--body-muted);
+}
+/* --- IBAN / İLETİŞİM BİLGİLERİ --- */
+.info-box{
+  background:#22211e;border:1px solid rgba(255,255,255,.06);
+  border-radius:.75rem;padding:1rem 1.25rem;margin-bottom:1rem;
+  display:none;font-size:.8rem;
+}
+.info-box.visible{display:block}
+.info-box .info-row{display:flex;gap:.75rem;align-items:flex-start;padding:.35rem 0}
+.info-box .info-row + .info-row{border-top:1px solid rgba(255,255,255,.04)}
+.info-box .info-icon{color:var(--gold);flex-shrink:0;min-width:1.2rem}
+.info-box .info-label{color:var(--body-muted);margin-right:.25rem}
+.info-box .info-value{color:var(--body);font-weight:500;word-break:break-all}
+.info-box .info-copy-btn{
+  background:transparent;border:1px solid var(--gold);
+  color:var(--gold);border-radius:.3rem;padding:.15rem .5rem;
+  font-size:.65rem;cursor:pointer;transition:all .2s;margin-left:.5rem;
+}
+.info-box .info-copy-btn:hover{background:var(--gold);color:var(--ink)}
 /* --- BUTTON --- */
 .btn-primary{
   width:100%;padding:.9rem 2rem;
@@ -411,6 +452,51 @@ select.field option{background:#1a1a18;color:var(--body)}
           </div>
         </div>
 
+        <!-- ÖDEME YÖNTEMİ -->
+        <div class="field-group">
+          <div class="field-label" style="margin-bottom:.75rem">
+            <span style="display:inline-flex;align-items:center;gap:.5rem">
+              <span style="display:inline-block;width:1.5rem;height:1px;background:var(--gold-dim)"></span>
+              Ödeme Yöntemi
+            </span>
+          </div>
+          <div class="payment-options" id="paymentOptions">
+            <label class="payment-option selected" id="optCredit">
+              <input type="radio" name="odeme_yontemi" value="credit" checked>
+              <span class="option-label">Kredi Kartı</span>
+              <span class="option-desc">Tek çekim veya taksitli ödeme</span>
+            </label>
+            <label class="payment-option" id="optHavale">
+              <input type="radio" name="odeme_yontemi" value="havale">
+              <span class="option-label">Havale / EFT</span>
+              <span class="option-desc">%15 indirim avantajı</span>
+            </label>
+          </div>
+          <input type="hidden" name="toplam_tutar" id="h_toplam_tutar" value="0">
+        </div>
+
+        <!-- IBAN VE İLETİŞİM BİLGİLERİ (config'den doldurulur) -->
+        <div class="info-box" id="ibanBox">
+          <div class="info-row">
+            <span class="info-icon">🏦</span>
+            <div>
+              <span class="info-label">IBAN:</span>
+              <span class="info-value" id="ibanValue"></span>
+              <button type="button" class="info-copy-btn" id="ibanCopyBtn">Kopyala</button>
+            </div>
+          </div>
+        </div>
+        <div class="info-box visible" id="contactBox">
+          <div class="info-row">
+            <span class="info-icon">📞</span>
+            <div><span class="info-label">Telefon:</span> <span class="info-value" id="phoneValue"></span></div>
+          </div>
+          <div class="info-row">
+            <span class="info-icon">📱</span>
+            <div><span class="info-label">WhatsApp:</span> <span class="info-value" id="whatsappValue"></span></div>
+          </div>
+        </div>
+
         <!-- NOT -->
         <div class="field-group">
           <label class="field-label" for="not">Özel İstek / Not</label>
@@ -495,6 +581,65 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
   btnMinus.addEventListener('click', function() { update(parseInt(display.textContent) - 1); });
 });
 
+// --- Config yükle (IBAN, telefon, WhatsApp) ---
+(function() {
+  fetch('/api/config').then(function(r) { return r.json(); }).then(function(cfg) {
+    if (cfg.success && cfg.config) {
+      var c = cfg.config;
+      if (c.iban) {
+        document.getElementById('ibanValue').textContent = c.iban;
+        document.getElementById('ibanBox').classList.add('visible');
+      }
+      if (c.phone)  document.getElementById('phoneValue').textContent = c.phone;
+      if (c.whatsapp) document.getElementById('whatsappValue').textContent = c.whatsapp;
+    }
+  }).catch(function() {});
+})();
+
+// --- Ödeme yöntemi seçimi ---
+(function() {
+  var radios = document.querySelectorAll('input[name="odeme_yontemi"]');
+  var ibanBox = document.getElementById('ibanBox');
+  radios.forEach(function(r) {
+    r.addEventListener('change', function() {
+      document.querySelectorAll('.payment-option').forEach(function(opt) {
+        opt.classList.remove('selected');
+      });
+      this.closest('.payment-option').classList.add('selected');
+      // Havale seçiliyse IBAN'ı göster
+      if (this.value === 'havale' || this.value === 'transfer') {
+        ibanBox.classList.add('visible');
+      } else {
+        ibanBox.classList.remove('visible');
+      }
+    });
+  });
+})();
+
+// --- IBAN Kopyala ---
+document.getElementById('ibanCopyBtn').addEventListener('click', function() {
+  var iban = document.getElementById('ibanValue').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(iban).then(function() {
+      var btn = document.getElementById('ibanCopyBtn');
+      btn.textContent = 'Kopyalandı!';
+      setTimeout(function() { btn.textContent = 'Kopyala'; }, 2000);
+    }).catch(function() {});
+  } else {
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = iban;
+    ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    var btn = document.getElementById('ibanCopyBtn');
+    btn.textContent = 'Kopyalandı!';
+    setTimeout(function() { btn.textContent = 'Kopyala'; }, 2000);
+  }
+});
+
 // --- Fiyat Hesaplama ---
 document.getElementById('calcPriceBtn').addEventListener('click', async function() {
   var btn = this;
@@ -504,6 +649,8 @@ document.getElementById('calcPriceBtn').addEventListener('click', async function
   var odaTipi = form.oda_tipi.value;
   var yetiskinSayisi = document.getElementById('h_yetiskin_sayisi').value || 2;
   var cocukSayisi = document.getElementById('h_cocuk_sayisi').value || 0;
+  var odemeYontemi = document.querySelector('input[name="odeme_yontemi"]:checked');
+  odemeYontemi = odemeYontemi ? odemeYontemi.value : 'credit';
   var box = document.getElementById('pricingBox');
   var resultDiv = document.getElementById('pricingResult');
   var loadingDiv = document.getElementById('pricingLoading');
@@ -544,7 +691,8 @@ document.getElementById('calcPriceBtn').addEventListener('click', async function
         giris: giris,
         cikis: cikis,
         yetiskin_sayisi: parseInt(yetiskinSayisi),
-        cocuk_sayisi: parseInt(cocukSayisi)
+        cocuk_sayisi: parseInt(cocukSayisi),
+        payment_method: odemeYontemi
       })
     });
 
@@ -593,6 +741,14 @@ document.getElementById('calcPriceBtn').addEventListener('click', async function
     rowsDiv.innerHTML = html;
     totalSpan.textContent = p.total.toLocaleString('tr-TR') + ' TL';
     resultDiv.style.display = 'block';
+    document.getElementById('h_toplam_tutar').value = p.total;
+    // Havale seçili ve indirim varsa belirt
+    if (data.pricing.discounts.some(function(d) { return d.indexOf('Havale') > -1; })) {
+      var note = document.createElement('div');
+      note.style.cssText = 'margin-top:.5rem;padding:.5rem;background:rgba(134,239,172,.1);border:1px solid rgba(134,239,172,.2);border-radius:.4rem;font-size:.75rem;color:#86efac;text-align:center';
+      note.textContent = '✅ Havale indirimi (%15) fiyata yansıtılmıştır.';
+      document.getElementById('pricingRows').appendChild(note);
+    }
 
   } catch (err) {
     loadingDiv.style.display = 'none';
@@ -663,7 +819,7 @@ document.getElementById('reservationForm').addEventListener('submit', async func
     if (result.success) {
       // Başarılı → success sayfasını göster
       formWrapper.style.display = 'none';
-      document.getElementById('successMessage').textContent = result.message;
+      document.getElementById('successMessage').innerHTML = result.message.replace(/\n/g, '<br>');
       document.getElementById('successPage').style.display = 'block';
       document.getElementById('successPage').scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
