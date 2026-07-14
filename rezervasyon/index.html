@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rezervasyon — Adin Beach Hotel</title>
 <meta name="theme-color" content="#bb9b6a">
-<link rel="icon" type="image/png" href="../images/brand/favIcon.png">
+<link rel="icon" type="image/png" href="../assets/images/brand/logo.png">
 <link rel="stylesheet" href="../assets/css/google-fonts.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -125,6 +125,42 @@ select.field option{background:#1a1a18;color:var(--body)}
 }
 .guest-inputs{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.5rem}
 @media(max-width:480px){.guest-inputs{grid-template-columns:1fr}}
+/* --- PRICING --- */
+.pricing-box{
+  background:#22211e;border:1px solid rgba(255,255,255,.06);
+  border-radius:.75rem;padding:1.25rem;margin-bottom:1.5rem;
+  display:none;
+}
+.pricing-box.visible{display:block}
+.pricing-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.5rem 0;font-size:.85rem;
+}
+.pricing-row + .pricing-row{border-top:1px solid rgba(255,255,255,.04)}
+.pricing-label{color:var(--body-muted)}
+.pricing-value{color:var(--body);font-weight:500}
+.pricing-total{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.75rem 0 0;margin-top:.5rem;
+  border-top:1px solid var(--gold);font-size:1.05rem;
+}
+.pricing-total .label{color:var(--gold);font-weight:600}
+.pricing-total .value{color:#fff;font-weight:700;font-size:1.15rem}
+.pricing-discount{color:#86efac;font-size:.8rem}
+.pricing-loading{text-align:center;padding:1rem;color:var(--body-muted);font-size:.85rem}
+.pricing-error{color:#fca5a5;font-size:.8rem;text-align:center;padding:.5rem}
+.btn-calc{
+  width:100%;padding:.75rem 1.5rem;
+  background:transparent;border:1px solid var(--gold);
+  color:var(--gold);border-radius:.5rem;
+  font-family:'Montserrat',system-ui,sans-serif;
+  font-weight:600;font-size:.8rem;
+  letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;transition:all .3s;margin-bottom:1rem;
+}
+.btn-calc:hover{background:var(--gold);color:var(--ink)}
+.btn-calc:disabled{opacity:.5;cursor:not-allowed}
+.btn-calc.loading{pointer-events:none;opacity:.6}
 /* --- BUTTON --- */
 .btn-primary{
   width:100%;padding:.9rem 2rem;
@@ -350,6 +386,31 @@ select.field option{background:#1a1a18;color:var(--body)}
           <p style="font-size:.75rem;color:var(--body-muted);margin-top:.25rem">E-posta veya telefon alanından en az birini doldurunuz.</p>
         </div>
 
+        <!-- FİYAT HESAPLAMA -->
+        <div class="field-group">
+          <div class="field-label" style="margin-bottom:.75rem">
+            <span style="display:inline-flex;align-items:center;gap:.5rem">
+              <span style="display:inline-block;width:1.5rem;height:1px;background:var(--gold-dim)"></span>
+              Fiyat Bilgisi
+            </span>
+          </div>
+          <button type="button" class="btn-calc" id="calcPriceBtn">Fiyat Hesapla</button>
+          <div class="pricing-box" id="pricingBox">
+            <div class="pricing-loading" id="pricingLoading">Hesaplanıyor...</div>
+            <div id="pricingResult" style="display:none">
+              <div id="pricingRows"></div>
+              <div class="pricing-total">
+                <span class="label">TOPLAM</span>
+                <span class="value" id="pricingTotal"></span>
+              </div>
+              <div style="margin-top:.75rem;font-size:.75rem;color:var(--body-muted);text-align:center">
+                Fiyatlara KDV dahildir. Kesin fiyat bilgisi rezervasyon onayında netleşir.
+              </div>
+            </div>
+            <div class="pricing-error" id="pricingError" style="display:none"></div>
+          </div>
+        </div>
+
         <!-- NOT -->
         <div class="field-group">
           <label class="field-label" for="not">Özel İstek / Not</label>
@@ -432,6 +493,116 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
 
   btnPlus.addEventListener('click',  function() { update(parseInt(display.textContent) + 1); });
   btnMinus.addEventListener('click', function() { update(parseInt(display.textContent) - 1); });
+});
+
+// --- Fiyat Hesaplama ---
+document.getElementById('calcPriceBtn').addEventListener('click', async function() {
+  var btn = this;
+  var form = document.getElementById('reservationForm');
+  var giris = form.giris.value.trim();
+  var cikis = form.cikis.value.trim();
+  var odaTipi = form.oda_tipi.value;
+  var yetiskinSayisi = document.getElementById('h_yetiskin_sayisi').value || 2;
+  var cocukSayisi = document.getElementById('h_cocuk_sayisi').value || 0;
+  var box = document.getElementById('pricingBox');
+  var resultDiv = document.getElementById('pricingResult');
+  var loadingDiv = document.getElementById('pricingLoading');
+  var errorDiv = document.getElementById('pricingError');
+  var rowsDiv = document.getElementById('pricingRows');
+  var totalSpan = document.getElementById('pricingTotal');
+
+  // Hata/önceki sonucu temizle
+  errorDiv.style.display = 'none';
+  resultDiv.style.display = 'none';
+  loadingDiv.style.display = 'block';
+  box.classList.add('visible');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.textContent = 'Hesaplanıyor...';
+
+  var errors = [];
+  if (!giris) errors.push('Giriş tarihi seçin.');
+  if (!cikis) errors.push('Çıkış tarihi seçin.');
+  if (!odaTipi) errors.push('Oda tipi seçin.');
+
+  if (errors.length) {
+    loadingDiv.style.display = 'none';
+    errorDiv.textContent = errors.join(' ');
+    errorDiv.style.display = 'block';
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.textContent = 'Fiyat Hesapla';
+    return;
+  }
+
+  try {
+    var res = await fetch('/api/pricing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        oda: odaTipi,
+        giris: giris,
+        cikis: cikis,
+        yetiskin_sayisi: parseInt(yetiskinSayisi),
+        cocuk_sayisi: parseInt(cocukSayisi)
+      })
+    });
+
+    var data = await res.json();
+
+    if (!data.success) {
+      throw new Error(data.error || 'Fiyat hesaplanamadı.');
+    }
+
+    loadingDiv.style.display = 'none';
+
+    // Fiyat satırlarını oluştur
+    var html = '';
+    var p = data.pricing;
+
+    // Gecelik baz fiyat (özet)
+    html += '<div class="pricing-row">';
+    html += '<span class="pricing-label">Gecelik Baz Fiyat (' + data.dates.nights + ' gece)</span>';
+    html += '<span class="pricing-value">' + p.subtotal.toLocaleString('tr-TR') + ' TL</span>';
+    html += '</div>';
+
+    // Ek yetişkin
+    if (p.extraAdultCount > 0) {
+      html += '<div class="pricing-row">';
+      html += '<span class="pricing-label">Ek Yetişkin (' + p.extraAdultCount + ' kişi x ' + p.extraAdultFee.toLocaleString('tr-TR') + ' TL x ' + data.dates.nights + ' gece)</span>';
+      html += '<span class="pricing-value">+' + p.extraAdultTotal.toLocaleString('tr-TR') + ' TL</span>';
+      html += '</div>';
+    }
+
+    // Çocuk
+    if (data.guests.children > 0 && p.childTotal > 0) {
+      html += '<div class="pricing-row">';
+      html += '<span class="pricing-label">Çocuk Ücreti (' + data.guests.children + ' çocuk)</span>';
+      html += '<span class="pricing-value">+' + p.childTotal.toLocaleString('tr-TR') + ' TL</span>';
+      html += '</div>';
+    }
+
+    // İndirimler
+    if (p.discounts.length > 0) {
+      html += '<div class="pricing-row">';
+      html += '<span class="pricing-label pricing-discount">' + p.discounts.join(', ') + '</span>';
+      html += '<span class="pricing-value pricing-discount">-' + p.discountAmount.toLocaleString('tr-TR') + ' TL</span>';
+      html += '</div>';
+    }
+
+    rowsDiv.innerHTML = html;
+    totalSpan.textContent = p.total.toLocaleString('tr-TR') + ' TL';
+    resultDiv.style.display = 'block';
+
+  } catch (err) {
+    loadingDiv.style.display = 'none';
+    errorDiv.textContent = err.message || 'Fiyat hesaplanırken bir hata oluştu.';
+    errorDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.textContent = 'Fiyat Hesapla';
+  }
 });
 
 // --- Form submit (fetch API) ---
