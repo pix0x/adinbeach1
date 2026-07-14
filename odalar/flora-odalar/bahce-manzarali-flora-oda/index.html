@@ -1,0 +1,207 @@
+﻿<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bahçe Manzaralı Flora Oda — Adin Hotel</title>
+<meta name="description" content="Huzur, konfor, lüks, ayrıcalık ve ferahlık…">
+<meta name="theme-color" content="#bb9b6a">
+<link rel="icon" type="image/png" href="/adinbeach/assets/images/brand/logo.png">
+<style>
+*,:after,:before{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#fafaf9;color:#1c1917;line-height:1.6;overflow-x:hidden}
+img{max-width:100%;height:auto;display:block}
+a{text-decoration:none;color:inherit}
+
+/* Breadcrumb */
+.breadcrumb-bar{background:white;border-bottom:1px solid #e7e5e4;padding:14px 0;font-size:13px;position:sticky;top:0;z-index:10}
+.breadcrumb-bar .container{max-width:1200px;margin:0 auto;padding:0 24px}
+.breadcrumb-bar a{color:#bb9b6a}
+.breadcrumb-bar a:hover{text-decoration:underline}
+.breadcrumb-bar span{color:#a8a29e}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);color:white;padding:80px 0 60px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("/adinbeach/assets/images/odalar/flora-oda.webp") center/cover;opacity:0.12;z-index:0}
+.hero .container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.hero h1{font-size:2.8rem;font-weight:300;letter-spacing:2px;margin-bottom:10px;line-height:1.15}
+.hero .sub{font-size:1.15rem;color:#bb9b6a;font-style:italic;max-width:600px;margin:0 auto}
+@media(max-width:768px){.hero h1{font-size:1.8rem}.hero{padding:60px 0 40px}}
+
+/* Marquee */
+.marquee{background:#1e293b;border-block:1px solid rgba(255,255,255,0.06);padding:12px 0;overflow:hidden;white-space:nowrap}
+.marquee-inner{display:inline-flex;gap:32px;animation:scroll 30s linear infinite}
+.marquee-inner span{color:#bb9b6a;font-size:12px;letter-spacing:4px;text-transform:uppercase;opacity:0.7}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* Content */
+.content{padding:64px 0}
+.content .container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+/* Description */
+.desc-section{max-width:800px;margin:0 auto 56px}
+.desc-section h2{font-size:1.8rem;font-weight:300;letter-spacing:1px;color:#1c1917;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #bb9b6a;display:inline-block}
+.desc-section p{font-size:1.05rem;line-height:1.9;color:#57534e;margin-bottom:16px}
+.desc-section em{color:#78716c;font-size:0.95rem}
+
+/* Specs */
+.specs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:20px;max-width:800px;margin:0 auto 56px}
+.spec-item{background:white;border:1px solid #e7e5e4;border-radius:12px;padding:24px 16px;text-align:center;transition:box-shadow 0.3s,border-color 0.3s}
+.spec-item:hover{border-color:#bb9b6a;box-shadow:0 4px 20px rgba(187,155,106,0.12)}
+.spec-icon svg{width:32px;height:32px;margin:0 auto 12px;display:block}
+.spec-value{display:block;font-size:1.05rem;font-weight:600;color:#1c1917;margin-bottom:4px}
+.spec-label{display:block;font-size:0.8rem;color:#a8a29e;text-transform:uppercase;letter-spacing:1px}
+
+/* Amenities */
+.amenities-section{max-width:700px;margin:0 auto 56px}
+.amenities-section h3{text-align:center;font-size:1.4rem;font-weight:300;letter-spacing:2px;color:#1c1917;margin-bottom:32px;text-transform:uppercase}
+.amenities-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.amenity-item{display:flex;align-items:center;gap:10px;font-size:0.95rem;color:#444;padding:10px 14px;background:white;border:1px solid #f0edea;border-radius:8px;transition:background 0.2s}
+.amenity-item:hover{background:#faf5ef}
+.amenity-check{width:18px;height:18px;color:#bb9b6a;flex-shrink:0}
+
+/* Gallery */
+.gallery-section{margin:48px auto 56px;max-width:1000px}
+.gallery-section h3{text-align:center;font-size:1.4rem;font-weight:300;letter-spacing:2px;color:#1c1917;margin-bottom:32px;text-transform:uppercase}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.gallery-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;transition:transform 0.4s,box-shadow 0.4s;cursor:pointer}
+.gallery-grid img:hover{transform:scale(1.03);box-shadow:0 8px 30px rgba(0,0,0,0.15)}
+@media(max-width:640px){.gallery-grid{grid-template-columns:1fr 1fr}}
+
+/* CTA */
+.cta-section{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);color:white;padding:60px 0;text-align:center}
+.cta-section .container{max-width:1200px;margin:0 auto;padding:0 24px}
+.cta-section h3{font-size:1.6rem;font-weight:300;margin-bottom:8px}
+.cta-section p{color:#a8a29e;font-size:0.95rem;margin-bottom:28px}
+.cta-btn{display:inline-block;background:#bb9b6a;color:white;padding:16px 48px;border-radius:6px;font-weight:600;letter-spacing:1.5px;font-size:14px;transition:background 0.3s;text-transform:uppercase}
+.cta-btn:hover{background:#a08050}
+.cta-tel{display:inline-block;margin-top:16px;color:#bb9b6a;font-size:1.4rem;font-weight:600}
+.cta-tel:hover{color:#c9ab7a}
+
+/* Other Rooms */
+.other-section{padding:64px 0;background:white}
+.other-section .container{max-width:1200px;margin:0 auto;padding:0 24px}
+.other-section h3{text-align:center;font-size:1.4rem;font-weight:300;letter-spacing:2px;color:#1c1917;margin-bottom:40px;text-transform:uppercase}
+.other-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.other-card{display:flex;flex-direction:column;background:#fafaf9;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;transition:box-shadow 0.3s,transform 0.3s}
+.other-card:hover{box-shadow:0 8px 30px rgba(0,0,0,0.08);transform:translateY(-2px)}
+.other-card-img{overflow:hidden}
+.other-card-img img{width:100%;aspect-ratio:16/10;object-fit:cover;transition:transform 0.5s}
+.other-card:hover .other-card-img img{transform:scale(1.05)}
+.other-card-body{padding:20px;flex:1;display:flex;flex-direction:column}
+.other-card-badge{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#bb9b6a;margin-bottom:6px;display:block}
+.other-card-body h4{font-size:1.2rem;font-weight:500;color:#1c1917;margin-bottom:6px}
+.other-card-body p{font-size:0.85rem;color:#78716c;line-height:1.5;margin-bottom:12px}
+.other-card-link{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#bb9b6a;margin-top:auto}
+.other-card:hover .other-card-link{text-decoration:underline}
+
+/* Footer */
+.site-footer{background:#0f172a;color:rgba(255,255,255,0.65);padding:48px 0 32px}
+.site-footer .container{max-width:1200px;margin:0 auto;padding:0 24px;text-align:center}
+.site-footer p{font-size:12px;line-height:1.6}
+
+/* Back link */
+.back-nav{text-align:center;padding:32px 0 0}
+.back-nav a{color:#78716c;font-size:13px;transition:color 0.2s}
+.back-nav a:hover{color:#bb9b6a}
+</style></head><body>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+<div class="container">
+<a href="/adinbeach/">Anasayfa</a> › <a href="/adinbeach/odalar/">Odalar</a> › <a href="/adinbeach/odalar/flora-odalar/">Flora Odalar</a> › <span>Bahçe Manzaralı Flora Oda</span>
+</div></div>
+
+<!-- Hero -->
+<section class="hero">
+<div class="container">
+<h1>Bahçe Manzaralı Flora Oda</h1>
+<p class="sub">Huzur, konfor, lüks, ayrıcalık ve ferahlık…</p>
+</div></section>
+
+<!-- Marquee -->
+<div class="marquee"><div class="marquee-inner">
+<span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span><span>KAYDIR KEŞFET •</span>
+</div></div>
+
+<!-- Content -->
+<section class="content">
+<div class="container">
+
+<!-- Description -->
+<div class="desc-section">
+<h2>Bahçe Manzaralı Flora Oda</h2>
+<p>Çocuklarınızın yanınızda mı olmasını istiyorsunuz… Flora standart odalarımız tam size göre…</p>
+<p>Yaklaşık 53 farklı bitki çeşidinin bulunduğu flora içerisinde yer alan, 1 yatak odası, 1 banyo ve balkonuyla tatil anlayışınızı bambaşka bir boyuta taşıyacak olan Flora odalarında, doğanın konforla buluştuğu bir deneyim sizi bekliyor.</p>
+<p><em>Flora odalarımızın bulunduğu binaların her biri 3'er kattan oluşmakta ve binalarda asansör bulunmamaktadır.</em></p>
+</div>
+
+<!-- Room Specs -->
+<div class="specs-grid">
+<div class="spec-item"><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#bb9b6a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><span class="spec-value">2+1 Kişi</span><span class="spec-label">Kişi Kapasitesi</span></div>
+<div class="spec-item"><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#bb9b6a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><span class="spec-value">2+2 Kişi</span><span class="spec-label">Ranzalı Sistem</span></div>
+<div class="spec-item"><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#bb9b6a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><span class="spec-value">26 m²</span><span class="spec-label">Oda Büyüklüğü</span></div>
+<div class="spec-item"><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#bb9b6a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><span class="spec-value">Balkon</span><span class="spec-label">Özellik</span></div>
+<div class="spec-item"><div class="spec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#bb9b6a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><span class="spec-value">Bahçe Manzarası</span><span class="spec-label">Manzara</span></div>
+</div>
+
+<!-- Amenities -->
+<div class="amenities-section">
+<h3>Odanın Sunduğu Rahatlıklar</h3>
+<ul class="amenities-list">
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Yatak Odası</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Balkon</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Duş Kabinli Banyo</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Klima</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Minibar</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Kettle (Çay Seti)</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Dijital Kasa</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Telefon</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Saç Kurutma Makinası</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Kapı Dürbünü</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Yangın Dedektörü</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Elektronik Kapı Kartı</li>
+<li class="amenity-item"><svg viewBox="0 0 20 20" fill="currentColor" class="amenity-check"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Wi-Fi (Ücretsiz)</li>
+</ul>
+</div>
+
+<!-- Gallery -->
+<div class="gallery-section">
+<h3>Galeri</h3>
+<div class="gallery-grid">
+<a href="/adinbeach/assets/images/odalar/flora-oda.webp" target="_blank"><img src="/adinbeach/assets/images/odalar/flora-oda.webp" alt="Bahçe Manzaralı Flora Oda" loading="lazy"/></a><a href="/adinbeach/assets/images/odalar/flora-oda.webp" target="_blank"><img src="/adinbeach/assets/images/odalar/flora-oda.webp" alt="Bahçe Manzaralı Flora Oda" loading="lazy"/></a><a href="/adinbeach/assets/images/odalar/flora-oda.webp" target="_blank"><img src="/adinbeach/assets/images/odalar/flora-oda.webp" alt="Bahçe Manzaralı Flora Oda" loading="lazy"/></a>
+</div>
+</div>
+
+</div></section>
+
+<!-- CTA -->
+<section class="cta-section">
+<div class="container">
+<h3>Hemen Rezervasyon Yapın</h3>
+<p>Size özel teklifimizi hazırlamamız için bize ulaşın.</p>
+<a class="cta-btn" href="/adinbeach/rezervasyon/">Rezervasyon Yap</a>
+<br>
+<a class="cta-tel" href="tel:+905555555555">+90 555 555 55 55</a>
+</div></section>
+
+<!-- Other Rooms -->
+<section class="other-section">
+<div class="container">
+<h3>Diğer Flora Odalarımız</h3>
+<div class="other-grid">
+<a href="/adinbeach/odalar/flora-odalar/bahce-manzarali-flora-connection-oda" class="other-card"><div class="other-card-img"><img src="/adinbeach/assets/images/odalar/flora-connection.webp" alt="Bahçe Manzaralı Flora Connection Oda" loading="lazy"/></div><div class="other-card-body"><span class="other-card-badge">BAHÇE MANZARASI</span><h4>Bahçe Manzaralı Flora Connection Oda</h4><p>Aileler için özel tasarlanmış bağlantılı odalar…</p><span class="other-card-link">Gözat &rarr;</span></div></a>
+<a href="/adinbeach/odalar/flora-odalar/bahce-manzarali-flora-dublex-oda" class="other-card"><div class="other-card-img"><img src="/adinbeach/assets/images/odalar/flora-dublex.webp" alt="Bahçe Manzaralı Flora Dublex Oda" loading="lazy"/></div><div class="other-card-body"><span class="other-card-badge">BAHÇE MANZARASI</span><h4>Bahçe Manzaralı Flora Dublex Oda</h4><p>İki katlı, ailelere özel tasarım…</p><span class="other-card-link">Gözat &rarr;</span></div></a>
+<a href="/adinbeach/odalar/flora-odalar/bahce-deniz-manzarali-flora-mercan" class="other-card"><div class="other-card-img"><img src="/adinbeach/assets/images/odalar/flora-mercan.webp" alt="Bahçe & Deniz Manzaralı Flora Mercan" loading="lazy"/></div><div class="other-card-body"><span class="other-card-badge">BAHÇE MANZARASI</span><h4>Bahçe & Deniz Manzaralı Flora Mercan</h4><p>Deniz ve bahçe manzarası bir arada…</p><span class="other-card-link">Gözat &rarr;</span></div></a>
+<a href="/adinbeach/odalar/flora-odalar/bahce-manzarali-flora-yasemin" class="other-card"><div class="other-card-img"><img src="/adinbeach/assets/images/odalar/flora-yasemin.webp" alt="Bahçe Manzaralı Flora Yasemin" loading="lazy"/></div><div class="other-card-body"><span class="other-card-badge">BAHÇE MANZARASI</span><h4>Bahçe Manzaralı Flora Yasemin</h4><p>Doğanın kalbinde, huzur dolu bir kaçamak…</p><span class="other-card-link">Gözat &rarr;</span></div></a>
+</div>
+<div class="back-nav">
+<a href="/adinbeach/odalar/flora-odalar/">← Tüm Flora Odalar Sayfasına Dön</a>
+</div>
+</div></section>
+
+<!-- Footer -->
+<footer class="site-footer">
+<div class="container">
+<p>Adin Resort Hotel — İncekum Mevkii, 07407 Alanya / Antalya / Türkiye</p>
+<p style="margin-top:8px">Tel: <a href="tel:+905555555555" style="color:#bb9b6a">+90 555 555 55 55</a> — <a href="mailto:info@adinhotel.com" style="color:#bb9b6a">info@adinhotel.com</a></p>
+<p style="margin-top:16px;color:rgba(255,255,255,0.4)">© 2026 Adin Beach Hotel. Tüm hakları saklıdır.</p>
+</div></footer>
+<script src="../../../assets/js/i18n.js"></script></body></html>

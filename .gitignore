@@ -9,3 +9,33 @@ admin/config.json
 rezervasyonlar.json
 
 .vercel
+
+# Nuxt root asset stubs (duplicates of assets/js/)
+/assets/*.js
+
+# Temp scripts
+check_*.mjs
+scan_*.mjs
+fix_*.mjs
+fix-*.ps1
+cleanup*.ps1
+analyze_*.mjs
+investigate.mjs
+mirror_site.py
+download_missing.py
+find_missing*.js
+
+# Build artifacts
+_payload.json
+404_report.json
+.htaccess
+
+# Mixed-case duplicates
+images/brand/favIcon.png
+
+# Backup files
+*.sub_fix_bak
+*.bak
+*.bak2
+*pre_fix
+*pre_fix2
