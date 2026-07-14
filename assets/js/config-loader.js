@@ -21,7 +21,7 @@
         // Link içindeki metni de güncelle (telefon numarası görünen kısım)
         var textNode = telLinks[i].childNodes;
         for (var j = 0; j < textNode.length; j++) {
-          if (textNode[j].nodeType === 3) {
+          if (textNode[j].nodeType === 3 && /\d/.test(textNode[j].textContent)) {
             textNode[j].textContent = textNode[j].textContent.replace(/[\d\s\(\)\+\-]{7,}/g, c.phone);
           }
         }
