@@ -12,25 +12,25 @@ const PRICING = {
 
   // Oda fiyatları (sezon başına gecelik TL)
   rooms: [
-    { id: 'premium-dubleks-royal',        name: 'Deniz Manzaralı Premium Dubleks Royal Oda',     rates: { low: 4500, mid: 6500, high: 9500 } },
-    { id: 'premium-dubleks-superior',      name: 'Deniz Manzaralı Premium Dubleks Superior Oda', rates: { low: 4000, mid: 5800, high: 8500 } },
-    { id: 'premium-suit',                  name: 'Deniz Manzaralı Premium Suit Oda',             rates: { low: 3500, mid: 5000, high: 7500 } },
-    { id: 'premium-aile',                  name: 'Deniz Manzaralı Premium Aile Oda',             rates: { low: 3200, mid: 4600, high: 6800 } },
-    { id: 'premium-connection',            name: 'Deniz Manzaralı Premium Connection Oda',       rates: { low: 3800, mid: 5500, high: 8000 } },
-    { id: 'premium-standart',              name: 'Deniz Manzaralı Premium Standart Oda',         rates: { low: 2800, mid: 4000, high: 6000 } },
-    { id: 'premium-engelli',               name: 'Deniz Manzaralı Premium Engelli Oda',          rates: { low: 2600, mid: 3800, high: 5500 } },
-    { id: 'flora-oda',                     name: 'Bahçe Manzaralı Flora Oda',                    rates: { low: 2000, mid: 3000, high: 4500 } },
-    { id: 'flora-connection',              name: 'Bahçe Manzaralı Flora Connection Oda',         rates: { low: 2500, mid: 3600, high: 5200 } },
-    { id: 'flora-dublex',                  name: 'Bahçe Manzaralı Flora Dublex Oda',             rates: { low: 2800, mid: 4000, high: 5800 } },
-    { id: 'flora-mercan',                  name: 'Bahçe & Deniz Manzaralı Flora Mercan',         rates: { low: 3000, mid: 4200, high: 6200 } },
-    { id: 'flora-yasemin',                 name: 'Bahçe Manzaralı Flora Yasemin',                rates: { low: 2200, mid: 3200, high: 4800 } },
-    { id: 'villa-gloria',                  name: 'Villa Gloria',                                 rates: { low: 8000, mid: 12000, high: 18000 } },
-    { id: 'villa-magnolia',                name: 'Villa Magnolia',                               rates: { low: 10000, mid: 15000, high: 22000 } }
+    { id: 'premium-dubleks-royal',        name: 'Deniz Manzaralı Premium Dubleks Royal Oda',     rates: { low: 45000, mid: 65000, high: 95000 } },
+    { id: 'premium-dubleks-superior',      name: 'Deniz Manzaralı Premium Dubleks Superior Oda', rates: { low: 40000, mid: 58000, high: 85000 } },
+    { id: 'premium-suit',                  name: 'Deniz Manzaralı Premium Suit Oda',             rates: { low: 35000, mid: 50000, high: 75000 } },
+    { id: 'premium-aile',                  name: 'Deniz Manzaralı Premium Aile Oda',             rates: { low: 32000, mid: 46000, high: 68000 } },
+    { id: 'premium-connection',            name: 'Deniz Manzaralı Premium Connection Oda',       rates: { low: 38000, mid: 55000, high: 80000 } },
+    { id: 'premium-standart',              name: 'Deniz Manzaralı Premium Standart Oda',         rates: { low: 28000, mid: 40000, high: 60000 } },
+    { id: 'premium-engelli',               name: 'Deniz Manzaralı Premium Engelli Oda',          rates: { low: 26000, mid: 38000, high: 55000 } },
+    { id: 'flora-oda',                     name: 'Bahçe Manzaralı Flora Oda',                    rates: { low: 20000, mid: 30000, high: 45000 } },
+    { id: 'flora-connection',              name: 'Bahçe Manzaralı Flora Connection Oda',         rates: { low: 25000, mid: 36000, high: 52000 } },
+    { id: 'flora-dublex',                  name: 'Bahçe Manzaralı Flora Dublex Oda',             rates: { low: 28000, mid: 40000, high: 58000 } },
+    { id: 'flora-mercan',                  name: 'Bahçe & Deniz Manzaralı Flora Mercan',         rates: { low: 30000, mid: 42000, high: 62000 } },
+    { id: 'flora-yasemin',                 name: 'Bahçe Manzaralı Flora Yasemin',                rates: { low: 22000, mid: 32000, high: 48000 } },
+    { id: 'villa-gloria',                  name: 'Villa Gloria',                                 rates: { low: 80000, mid: 120000, high: 180000 } },
+    { id: 'villa-magnolia',                name: 'Villa Magnolia',                               rates: { low: 100000, mid: 150000, high: 220000 } }
   ],
 
   // Ek ücretler (sezon başına gecelik TL)
   surcharges: {
-    extraAdult: { low: 500, mid: 750, high: 1000 },
+    extraAdult: { low: 5000, mid: 7500, high: 10000 },
     childFreeAge: 6,
     childHalfAge: 12
   },

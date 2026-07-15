@@ -599,6 +599,9 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
 (function() {
   var radios = document.querySelectorAll('input[name="odeme_yontemi"]');
   var ibanBox = document.getElementById('ibanBox');
+  var pricingBox = document.getElementById('pricingBox');
+  var pricingResult = document.getElementById('pricingResult');
+  var pricingError = document.getElementById('pricingError');
   radios.forEach(function(r) {
     r.addEventListener('change', function() {
       document.querySelectorAll('.payment-option').forEach(function(opt) {
@@ -610,6 +613,20 @@ document.querySelectorAll('.stepper').forEach(function(stepper) {
         ibanBox.classList.add('visible');
       } else {
         ibanBox.classList.remove('visible');
+      }
+      // Önceden hesaplanmış fiyat varsa, yöntem değişince fiyatı temizle
+      if (pricingResult.style.display === 'block' || pricingError.style.display === 'block') {
+        pricingResult.style.display = 'none';
+        pricingError.style.display = 'none';
+        // Kullanıcıya yeniden hesaplaması gerektiğini bildiren ince bir ipucu
+        var hint = document.createElement('div');
+        hint.style.cssText = 'margin-top:.5rem;padding:.4rem .6rem;background:rgba(187,155,106,.08);border:1px solid rgba(187,155,106,.2);border-radius:.4rem;font-size:.7rem;color:var(--body-muted);text-align:center';
+        hint.textContent = 'Ödeme yöntemi değişti. Fiyatı güncellemek için "Fiyat Hesapla"ya tekrar tıklayın.';
+        hint.id = 'paymentChangeHint';
+        // Önceki ipucunu kaldır
+        var oldHint = document.getElementById('paymentChangeHint');
+        if (oldHint) oldHint.remove();
+        pricingBox.appendChild(hint);
       }
     });
   });
